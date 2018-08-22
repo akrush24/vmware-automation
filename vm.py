@@ -18,7 +18,7 @@ infraname= sys.argv[2]
 subnet_id= sys.argv[3]
 
 
-token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=('ansible', 'qwerty123')).json()['data']['token']
+token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=('', '')).json()['data']['token']
 headers = {'token':token}
 baseurl = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+subnet_id
 ip = requests.get(url=baseurl, headers=headers).json()['data']
@@ -64,9 +64,9 @@ sftp.close()
 ssh.close()
 
 
-vc_host='vc-linx.srv.local'
-vc_user='administrator@vsphere.local'
-vc_pass='Bsdserver$4$5'
+vc_host=''
+vc_user=''
+vc_pass=''
 service_instance = connect.SmartConnectNoSSL(host=vc_host,
                                                          user=vc_user,
                                                          pwd=vc_pass,
