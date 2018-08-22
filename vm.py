@@ -36,32 +36,35 @@ print(ip)
 paramiko.util.log_to_file('/tmp/paramiko.log')
 paramiko.util.load_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
 
-host = ip
-port = 22
-username = 'root'
 
-files = ['disk-size.part1.sh', 'disk-size.part2.sh']
-remote_images_path = '/root/'
-local_path = '/home/nokhrimenko/'
 
-ssh = paramiko.SSHClient()
-ssh.set_missing_host_key_policy(
+def disk_ext(ip):
+    files = ['disk-size.part1.sh', 'disk-size.part2.sh']
+    remote_images_path = '/root/'
+    local_path = '/home/nokhrimenko/'
+    username = 'root'
+    port = 22
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(
             paramiko.AutoAddPolicy())
 
-for file in files:
-    file_local = local_path + file
-    file_remote = remote_images_path + file
-    print (file_local + '>>>' + file_remote)
-    ssh.connect(hostname=host, port=port, username=username, key_filename='/home/nokhrimenko/.ssh/id_dsa')
-    sftp = ssh.open_sftp()
-    sftp.put(file_local, file_remote)
-    ssh.exec_command("chmod +x" " " + str(file_remote))
-    stdin, stdout, stderr = ssh.exec_command(file_remote)
-    print ("stderr: ", stderr.readlines())
-    print ("pwd: ", stdout.readlines())
-    time.sleep(50)
-sftp.close()
-ssh.close()
+    for file in files:
+        file_local = local_path + file
+        file_remote = remote_images_path + file
+        print (file_local + '>>>' + file_remote)
+        ssh.connect(hostname=ip, port=port, username=username, key_filename='/home/nokhrimenko/.ssh/id_dsa')
+        sftp = ssh.open_sftp()
+        sftp.put(file_local, file_remote)
+        ssh.exec_command("chmod +x" " " + str(file_remote))
+        stdin, stdout, stderr = ssh.exec_command(file_remote)
+        print ("stderr: ", stderr.readlines())
+        print ("pwd: ", stdout.readlines())
+        time.sleep(50)
+    sftp.close()
+    ssh.close()
+
+
+
 
 
 vc_host=''
