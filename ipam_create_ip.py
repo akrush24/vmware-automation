@@ -1,9 +1,11 @@
 import requests
+import sys 
+from passwd import *
 
 #user and pass ipam_api
 ##############
-user_api = ''
-pass_api = ''
+#user_api = ''
+#pass_api = ''
 ###############
 
 def ipam_create_ip(hostname, infraname, subnet_id):
