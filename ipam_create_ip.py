@@ -2,8 +2,8 @@ import requests
 
 #user and pass ipam_api
 ##############
-user_api = ''
-pass_api = ''
+user_api = 'ansible'
+pass_api = 'qwerty123'
 ###############
 
 def ipam_create_ip(hostname, infraname, subnet_id):
