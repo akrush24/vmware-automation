@@ -1,17 +1,6 @@
 import requests
 import sys 
-from passwd import *
-
-#user and pass ipam_api
-##############
-<<<<<<< HEAD
-#user_api = ''
-#pass_api = ''
-=======
-user_api = 'ansible'
-pass_api = 'qwerty123'
->>>>>>> e905f5645c31deb7eb0c66adbc88d0b35af7ab6e
-###############
+from passwd import user_api, pass_api
 
 def ipam_create_ip(hostname, infraname, subnet_id):
     token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
