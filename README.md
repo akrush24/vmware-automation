@@ -1,8 +1,4 @@
-# The largest heading
-## The second largest heading
-###### The smallest heading
-
-Test
+VMware Automation - набор скриптов для упращения развертывания виртуальныз машин в инфраструктуре vsphere
 
 
-Create New IP:  ./create_new_ip.py hostname-test test 114
+Create New PHPIPAM IP:  ./create_new_ip.py HOSTNAME DESCRIPTION SubnetID
