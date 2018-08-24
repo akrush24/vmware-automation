@@ -8,7 +8,6 @@ variable "vc_storage" { default = ""}
 
 variable "vm_portgroup" { default = ""}
 variable "vm_template" { default = ""}
-
 variable "vm_hostname" { default = ""}
 variable "vm_cpu" { default = ""}
 variable "vm_ram" { default = ""}
@@ -16,7 +15,6 @@ variable "vm_disk_size" { default = ""}
 variable "vm_ip" { default = ""}
 variable "vm_ip_gw" { default = ""}
 variable "vm_netmask" { default = ""}
-
 
 provider "vsphere" {
   user           = "${var.vc_user}"
