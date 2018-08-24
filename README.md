@@ -1,14 +1,9 @@
-# VMware Automation # 
-набор скриптов для упращения развертывания виртуальныз машин в инфраструктуре vsphere
+# The largest heading
+## The second largest heading
+###### The smallest heading
+
+Test
 
 
-### Create New PHPIpam IP ###  
-```./create_new_ip.py HOSTNAME DESCRIPTION SubnetID```
+Create New IP:  ./create_new_ip.py hostname-test test 114
 
-### Credentials ###
-```
-cat >> passwd.py<EOF
-user_api = 'user'
-pass_api = 'passwd'
-EOF
-```
