@@ -45,20 +45,21 @@ def check_ssh_port(ip):
 def checktime():
     close_check = 100
     while (time_out(time_start) == False):
-        if check_ssh_port(ip = ip) == True:
+        if check_ssh_port(ip) == True:
             return True
             break
         else:
             continue
 
 def start_main():
-    if check_ssh_port(ip = ip) == True:
-        connect_ssh(ip = ip, file = files[0])
+    if check_ssh_port(ip) == True:
+        connect_ssh(ip, file=files[0])
         time.sleep(10)
         if checktime() == True:
-            connect_ssh(ip=ip, file=files[1])
+            connect_ssh(ip, file=files[1])
         else:
             print('Connect timeout')
+
 
 start_main()
 

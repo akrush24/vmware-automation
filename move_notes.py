@@ -1,6 +1,14 @@
+import atexit
+from pyVim import connect
+from pyVmomi import vmodl
+from pyVmomi import vim
+from tools import tasks
+from tools import tasks
+from tools import cli
 
 
-def move_notes(folder, message):
+
+def move_notes(ip, folder, message):
     vc_host=''
     vc_user=''
     vc_pass=''
@@ -8,7 +16,7 @@ def move_notes(folder, message):
                                                          user=vc_user,
                                                          pwd=vc_pass,
                                                          port=443)
-    config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
+config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
 uuid = config_uuid.summary.config.instanceUuid
 message = ip + " " + infraname
 vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
