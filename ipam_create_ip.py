@@ -1,10 +1,6 @@
 import requests
-
-#user and pass ipam_api
-##############
-user_api = ''
-pass_api = ''
-###############
+import sys 
+from passwd import user_api, pass_api
 
 # EXAMPLE 
 # python3 ipam_create_ip.py HOSTNAME DESCRIPTION PHPIPAM_SubnetID
