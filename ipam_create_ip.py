@@ -1,4 +1,6 @@
 import requests
+import sys 
+from passwd import user_api, pass_api
 
 #user and pass ipam_api
 ##############
