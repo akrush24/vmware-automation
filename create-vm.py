@@ -10,24 +10,6 @@ from tools import tasks
 from tools import tasks
 from tools import cli
 
-user_api = 'ansible'
-pass_api = 'qwerty123'
-hostname = 'vmtest1'
-infraname = 'INFRA5000'
-cidr = '192.168.222.0/24'
-vc_host = 'vc-linx.srv.local'
-vc_user = ''
-vc_pass = ''
-vc_dc = 'Datacenter-Linx'
-vc_cluster = 'linx-cluster01'
-vc_storage = '27_localstore_r10'
-vm_template = 'template_centos7.3'
-vm_cpu = '2'
-vm_ram = '4096'
-vm_disk_size = '30'
-vm_ip_gw = '192.168.222.1'
-vm_netmask = '24'
-folder = 'test'
 # EXAMPLE
 # python3 ipam_create_ip.py HOSTNAME DESCRIPTION PHPIPAM_SubnetID
 
