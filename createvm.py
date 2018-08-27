@@ -1,5 +1,6 @@
 import requests
 import sys
+import re
 from passwd import user_api, pass_api, vc_user, vc_pass
 from python_terraform import *
 import atexit
@@ -41,7 +42,9 @@ def vlan_vm_int(cidr):
         vm_portgroup = port_int.get(cidr)
     else:
         print ('no network portgroup')
-
+    global vm_netmask, vm_ip_gw
+    vm_ip_gw = re.sub('[/]', '', cidr)[:-3]+'1'
+    vm_netmask = cidr[-2:]
     return vm_portgroup
 
 
@@ -57,9 +60,10 @@ def template(vm_template):
     else:
         print ('no template')
 
-def create_vm_terraform(ter_dir, vm_portgroup, ip):
+def create_vm_terraform(ter_dir, hostname, vm_portgroup, ip, vm_template,  vc_storage, vm_cpu, vm_ram,
+                                                vm_disk_size, vc_dc, vc_cluster, vm_ip_gw, vm_netmask):
     tf = Terraform(working_dir=ter_dir, variables={'vc_host': vc_host,
-                                                                                                         'vc_user': vc_user, 'vc_pass': vc_pass,
+                                                    'vc_user': vc_user, 'vc_pass': vc_pass,
                                                    'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
                                                    'vm_portgroup': vm_portgroup, 'vm_template': vm_template,
                                                    'vm_hostname': hostname, 'vm_cpu': vm_cpu, 'vm_ram': vm_ram,
@@ -72,7 +76,7 @@ def create_vm_terraform(ter_dir, vm_portgroup, ip):
     print(tf.apply(**kwargs))
 
 
-def move_notes_vm(ip, folder, infraname):
+def move_notes_vm(vc_host, vc_pass ip, folder, infraname):
     service_instance = connect.SmartConnectNoSSL(host=vc_host,
                                                          user=vc_user,
                                                          pwd=vc_pass,
