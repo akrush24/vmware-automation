@@ -3,6 +3,7 @@
 import sys
 import argparse
 from ipam_create_ip import ipam_create_ip
+import create-vm
 
 version = '0.0.1'
 
@@ -25,18 +26,6 @@ parser.add_argument('--version', '-V', action='version', version='Version: '+ver
 #parser.add_argument('--', dest='',      help='')
 
 args = parser.parse_args()
-
-if args.vmname is None:
-    print('The --vmname can not be empty');
-    quit();
-
-if args.desc is None:
-    print('The --desc can not be empty');
-    quit();
-
-if args.net is None:
-    print('The --net can not be empty');
-    quit();
 
 if args.onlyip is not 'No':
     ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
