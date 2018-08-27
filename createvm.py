@@ -79,7 +79,8 @@ def create_vm_terraform(ter_dir, hostname, vm_portgroup, ip, vm_template,  vc_st
 
 def move_notes_vm(vc_host, vc_pass ip, folder, infraname):
     folder_dc = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
-                  'vcsa.srv.local'  : 'Datacenter-AKB/vm/'}.get(vc_host)
+                  'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
+                  'vc-khut.srv.local': 'Datacenter-KHUT/vm/'}.get(vc_host)
 
 
     service_instance = connect.SmartConnectNoSSL(host=vc_host,
