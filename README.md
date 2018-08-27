@@ -13,5 +13,7 @@
 cat >> passwd.py<EOF
 user_api = 'user'
 pass_api = 'passwd'
+vc_user = ''
+vc_pass = ''
 EOF
 ```
