@@ -76,7 +76,12 @@ def create_vm_terraform(ter_dir, hostname, vm_portgroup, ip, vm_template,  vc_st
     print(tf.apply(**kwargs))
 
 
+
 def move_notes_vm(vc_host, vc_pass ip, folder, infraname):
+    folder_dc = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
+                  'vcsa.srv.local'  : 'Datacenter-AKB/vm/'}.get(vc_host)
+
+
     service_instance = connect.SmartConnectNoSSL(host=vc_host,
                                                          user=vc_user,
                                                          pwd=vc_pass,
@@ -90,7 +95,7 @@ def move_notes_vm(vc_host, vc_pass ip, folder, infraname):
     spec.annotation = message
     task = vm.ReconfigVM_Task(spec)
     tasks.wait_for_tasks(service_instance, [task])
-    dirname = 'Datacenter-Linx/vm/' + folder # урл директории для ВМ
+    dirname = folder_dc + folder # урл директории для ВМ
     movefolder = service_instance.content.searchIndex.FindByInventoryPath(dirname)
     movefolder.MoveIntoFolder_Task([config_uuid])
 
