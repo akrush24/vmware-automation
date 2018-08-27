@@ -1,6 +1,9 @@
 # VMware Automation #
 набор скриптов для упращения развертывания виртуальныз машин в инфраструктуре vsphere
 
+## INSTALLATION ##
+ * pip3 install pyVim
+
 
 ### Create New PHPIpam IP ###
 ```./create_new_ip.py HOSTNAME DESCRIPTION SubnetID```
