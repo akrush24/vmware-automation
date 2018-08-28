@@ -39,8 +39,6 @@ def template(vm_template):
     else:
         print ('no template')
 
-
-
 #varible
 def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size ):
@@ -121,9 +119,6 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
                         vm_cpu, vm_ram, vm_disk_size)
     notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
     move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
-
-
-
 
 
 

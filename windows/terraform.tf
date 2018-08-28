@@ -15,6 +15,8 @@ variable "vm_disk_size" { default = ""}
 variable "vm_ip" { default = ""}
 variable "vm_ip_gw" { default = ""}
 variable "vm_netmask" { default = ""}
+variable "vm_product_key" { default = "D2N9P-3P6X9-2R39C-7RTCD-MDVJX"}
+
 
 provider "vsphere" {
   user           = "${var.vc_user}"
@@ -76,15 +78,22 @@ resource "vsphere_virtual_machine" "vm" {
   clone {
     template_uuid = "${data.vsphere_virtual_machine.template.id}"
 
-    customize {
-      linux_options {
-        host_name = "${var.vm_hostname}"
-        domain    = "srv.local"
+     customize {
+      windows_options {
+        computer_name  = "${var.vm_hostname}"
+        workgroup    = "WORKGROUP"
+        admin_password = "qwerty$4"
+        product_key = "${var.vm_product_key}"
+        time_zone = "145"
       }
+
+
 
       network_interface {
         ipv4_address = "${var.vm_ip}"
         ipv4_netmask = "${var.vm_netmask}"
+        dns_server_list = ["172.20.20.20", "192.168.245.20"]
+        dns_domain = "srv.local"
       }
 
       ipv4_gateway = "${var.vm_ip_gw}"
