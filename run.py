@@ -42,4 +42,14 @@ if args.template is None:
 if args.onlyip is not 'No':
     ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
 else:
-    main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder=args.folder, vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem, vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter)
+    main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
+         vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
+         vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter)
+
+
+
+#
+# main (hostname='host889'! , infraname='INFRA8888'! , cidr='192.168.222.0/24! ', vc_host='vc-linx.srv.local',
+#       vc_user='nokhrimenko@phoenixit.ru', vc_pass='NikolonsO345831', vc_dc='Datacenter-Linx', vc_cluster='linx-cluster01',
+# vc_storage='27_localstore_r10'! , vm_template='template_centos7.3!'! , vm_cpu='1!', vm_ram='2048!', vm_disk_size='30!',
+#       folder_vm = 'test'! )
