@@ -2,9 +2,9 @@
 
 import sys
 import argparse
-from ipam_create_ip import ipam_create_ip
-from createvm import *
-
+#from ipam_create_ip import ipam_create_ip
+from cvm import *
+from passwd import user_api, pass_api, vc_user, vc_pass
 version = '0.0.1'
 
 parser = argparse.ArgumentParser()
@@ -45,6 +45,7 @@ else:
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter)
+
 
 
 
