@@ -15,17 +15,13 @@ parser.add_argument('--datastor', '-ds', dest='ds',      help="Datastore")
 parser.add_argument('--folde', dest='folder',  help='VM Folder in vCenter')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter')
 parser.add_argument('--cluster', '-cl', dest='cluster',  help='vSphere Cluster')
-
 parser.add_argument('--dsize', '-hdd', dest='dsize',   help='Disk Size')
 parser.add_argument('--msize', '-m', dest='mem',   help='RAM Size')
 parser.add_argument('--cpu', '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc', '-d', dest='desc',    help='Description', required=True)
 parser.add_argument('--template', '-tm', dest='template',    help='VM Template')
-
 parser.add_argument('--onlyip',dest='onlyip',  help='Only IP allocation (ex. --onlyip yes', default='No')
-
 parser.add_argument('--version', '-V', action='version', version='Version: '+version)
-
 parser.add_argument('--vcenter', dest='vcenter', help='vCenter URL')
 #parser.add_argument('--', dest='',      help='')
 
