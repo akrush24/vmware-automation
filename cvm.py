@@ -53,7 +53,8 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     def portgroup(cidr):
         port_int = {'192.168.222.0/24': '192.168.222',
                     '192.168.199.0/24': '192.168.199',
-                    '192.168.245.0/24': '245'}
+                    '192.168.245.0/24': '245',
+                    '192.168.14.0/23': 'VLAN14'}
 
         if port_int[cidr]:
             vm_portgroup = port_int.get(cidr)
@@ -100,7 +101,8 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname):
 def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
     folder_dc = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
                   'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
-                  'vc-khut.srv.local': 'Datacenter-KHUT/vm/'}.get(vc_host)
+                  'vc-khut.srv.local': 'Datacenter-KHUT/vm/',
+                  'vcenter.at-consulting.ru': 'SAV/vm/'}.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
     uuid = config_uuid.summary.config.instanceUuid
