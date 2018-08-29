@@ -44,7 +44,7 @@ def template(vm_template):
     else:
         print ('no template')
 
-#varible
+#varible5
 def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size ):
     vm_ip_gw = re.sub('[/]', '', cidr)[:-3] + '1'  # get GW (example 192.168.222.1)
