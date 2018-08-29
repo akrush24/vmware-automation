@@ -1,6 +1,7 @@
 import requests
 import sys
 import re
+import os
 from passwd import user_api, pass_api, vc_user, vc_pass
 from python_terraform import *
 import atexit
