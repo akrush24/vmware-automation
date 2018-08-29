@@ -61,7 +61,6 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
             print ('no network portgroup')
 
 
-
     vm_portgroup = portgroup(cidr)
     tf = Terraform(working_dir=ter_dir, variables={'vc_host': vc_host,
                                                    'vc_user': vc_user, 'vc_pass': vc_pass,
@@ -75,6 +74,12 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     tf.init()
     print(tf.plan())
     print(tf.apply(**kwargs))
+
+    # remove teraform state file
+    if os.path.exists(ter_dir+"/terraform.tfstate"):
+        os.remove(ter_dir+"/terraform.tfstate")
+    else:
+        print("Teraform state file is't Exist")
 
 
 #change folder, write notes
