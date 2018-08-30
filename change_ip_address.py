@@ -5,6 +5,19 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 
 
+def get_obj(content, vimtype, name):
+    obj = None
+    container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
+    for c in container.view:
+        if c.name == name:
+            obj = c
+            break
+    return obj
+
+
+si = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
+content = si.RetrieveContent()
+vm = get_obj(content, [vim.VirtualMachine], vm_name)
 
 
 
@@ -12,29 +25,21 @@ def power_off():
     if vm.runtime.powerState != 'poweredOff':
         vm.PowerOff()
 
-
-
 def power_on():
     if vm.runtime.powerState == 'poweredOff':
         vm.PowerOn()
 
 
 
+def change_port_group(cidr):
 
 
-
-def change_port_group():
-
-    def portgroup(cidr):
-        port_int = {'192.168.222.0/24': '192.168.222',
-                    '192.168.199.0/24': '192.168.199',
-                    '192.168.245.0/24': '245',
-                    '192.168.14.0/23': 'VLAN14'}
-
-
-
-    vm = get_obj(content, [vim.VirtualMachine], vm_name)
-    content = si.RetrieveContent()
+    cidr_to_portgrup = {'192.168.222.0/24': '192.168.222',
+                        '192.168.199.0/24': '192.168.199',
+                        '192.168.245.0/24': '245',
+                        '192.168.14.0/23': 'VLAN14'}
+    if cidr_to_portgrup[cidr]:
+        vm_portgroup = cidr_to_portgrup.get(cidr)
 
 
 
@@ -46,23 +51,17 @@ def change_port_group():
             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             nicspec.device = device
             nicspec.device.wakeOnLanEnabled = True
-        if not args.is_VDS:
-            nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
-            nicspec.device.backing.network = get_obj(content, [vim.Network], vm_new_portgroup)
-            nicspec.device.backing.deviceName = vm_new_portgroup
-        else:
-            network = get_obj(content, [vim.dvs.DistributedVirtualPortgroup], vm_net_portgroup)
+            network = get_obj(content, [vim.dvs.DistributedVirtualPortgroup], vm_portgroup)
             dvs_port_connection = vim.dvs.PortConnection()
             dvs_port_connection.portgroupKey = network.key
             dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
             nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
             nicspec.device.backing.port = dvs_port_connection
-
-        nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
-        nicspec.device.connectable.startConnected = True
-        nicspec.device.connectable.allowGuestControl = True
-        device_change.append(nicspec)
-        break
+            nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+            nicspec.device.connectable.startConnected = True
+            nicspec.device.connectable.allowGuestControl = True
+            device_change.append(nicspec)
+            break
 
     config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
     task = vm.ReconfigVM_Task(config_spec)
@@ -71,42 +70,36 @@ def change_port_group():
 
 
 
+
+
+
+
    # https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/change_vm_vif.py
 
-def guest_os(vm_name):
+
+def guest_os():
     windows = ['windows7Server64Guest', 'windows8Server64Guest']
     linux = ['centos64Guest', 'centos7_64Guest', 'ubuntu64Guest']
     vm_os = vm.guest.guestId
     if vm_os in windows:
-        return
+        windows_change_ip()
     elif vm_os in linux:
-        return
+        linux_change_ip()
     else:
         print("No support OS")
 
 
-def get_obj(content, vimtype, name):
-    obj = None
-    container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
-    for c in container.view:
-        if c.name == name:
-            obj = c
-            break
-    return obj
 
-
-def linux_change_ip(vm_name, new_ip):
-    si = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
-    content = si.RetrieveContent()
-    vm = get_obj(content, [vim.VirtualMachine], vm_name)
+def linux_change_ip():
     adaptermap = vim.vm.customization.AdapterMapping()
     globalip = vim.vm.customization.GlobalIPSettings()
     adaptermap.adapter = vim.vm.customization.IPSettings()
     adaptermap.adapter.ip = vim.vm.customization.FixedIp()
-    adaptermap.adapter.ip.ipAddress = new_ip
-    adaptermap.adapter.subnetMask = new_mask
-    adaptermap.adapter.gateway = new_gw_ip
+    adaptermap.adapter.ip.ipAddress = ip_address
+    adaptermap.adapter.subnetMask = net_mask
+    adaptermap.adapter.gateway = net_ip_gw
     globalip.dnsServerList = dns_server
+    globalip.IPSetings.dnsServerList = ['172.20.20.20', '192.168.245.20']
     adaptermap.adapter.dnsDomain = dns_prefix
     globalip = vim.vm.customization.GlobalIPSettings()
     ident = vim.vm.customization.LinuxPrep(domain='srv.local', hostName=vim.vm.customization.FixedName(name=vm_name))
@@ -117,7 +110,7 @@ def linux_change_ip(vm_name, new_ip):
     task = vm.Customize(spec=customspec)
 
 
-def windows_change_ip(vm_name, new_ip):
+def windows_change_ip():
     #https://github.com/vmware/pyvmomi/issues/261
     si = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     content = si.RetrieveContent()
@@ -129,15 +122,25 @@ def windows_change_ip(vm_name, new_ip):
     adaptermap.adapter.ip.ipAddress = new_ip
     adaptermap.adapter.subnetMask = new_mask
     adaptermap.adapter.gateway = new_gw_ip
-    globalip.dnsServerList = dns_server
     adaptermap.adapter.dnsDomain = dns_prefix
     globalip = vim.vm.customization.GlobalIPSettings()
+    globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
     ident = vim.vm.customization.Sysprep()
     ident.guiUnattended = vim.vm.customization.GuiUnattended()
     ident.userData = vim.vm.customization.UserData()
+    ident.userData.fullName = vm_name
+    ident.userData.orgName = "Rtech"
     ident.userData.computerName = vim.vm.customization.FixedName()
     ident.userData.computerName.name = vm_name
     ident.identification = vim.vm.customization.Identification()
+    customspec = vim.vm.customization.Specification()
+    customspec.identity = ident
+    customspec.nicSettingMap = [adaptermap]
+    customspec.globalIPSettings = globalip
+    task = vm.Customize(spec=customspec)
+
+
+
 
 
 
