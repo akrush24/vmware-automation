@@ -3,6 +3,28 @@ import atexit
 from pyVim import connect
 from pyVmomi import vmodl
 from pyVmomi import vim
+from passwd import user_api, pass_api, vc_user, vc_pass
+import requests
+
+# get ip address
+def ipam_create_ip(hostname, infraname, cidr):
+    try:
+       token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
+       headers = {'token':token}
+       cidr_url = 'http://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
+       get_sudnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+       get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_sudnet_id
+       ip = requests.get(url=get_ip_url, headers=headers).json()['data']
+       create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
+       create = requests.post(url = create_url , headers=headers).json()['success']
+       if create == True:
+          print ( ' ##### IP: '+ip+' ###### ')
+          return ip  # get ip address
+    except:
+       print("При выделении IP произошла ошибка!")
+
+
+
 
 
 def get_obj(content, vimtype, name):
@@ -19,8 +41,6 @@ si = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443
 content = si.RetrieveContent()
 vm = get_obj(content, [vim.VirtualMachine], vm_name)
 
-
-
 def power_off():
     if vm.runtime.powerState != 'poweredOff':
         vm.PowerOff()
@@ -29,19 +49,14 @@ def power_on():
     if vm.runtime.powerState == 'poweredOff':
         vm.PowerOn()
 
-
-
 def change_port_group(cidr):
-
-
     cidr_to_portgrup = {'192.168.222.0/24': '192.168.222',
                         '192.168.199.0/24': '192.168.199',
                         '192.168.245.0/24': '245',
-                        '192.168.14.0/23': 'VLAN14'}
+                        '192.168.14.0/23': 'VLAN14',
+                        '192.168.238.0/24': '192.168.238'}
     if cidr_to_portgrup[cidr]:
         vm_portgroup = cidr_to_portgrup.get(cidr)
-
-
 
     device_change = []
     for device in vm.config.hardware.device:
@@ -62,17 +77,8 @@ def change_port_group(cidr):
             nicspec.device.connectable.allowGuestControl = True
             device_change.append(nicspec)
             break
-
     config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
     task = vm.ReconfigVM_Task(config_spec)
-
-
-
-
-
-
-
-
 
    # https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/change_vm_vif.py
 
@@ -88,27 +94,23 @@ def guest_os():
     else:
         print("No support OS")
 
-
-
 def linux_change_ip():
     adaptermap = vim.vm.customization.AdapterMapping()
-    globalip = vim.vm.customization.GlobalIPSettings()
+    #globalip = vim.vm.customization.GlobalIPSettings()
     adaptermap.adapter = vim.vm.customization.IPSettings()
     adaptermap.adapter.ip = vim.vm.customization.FixedIp()
-    adaptermap.adapter.ip.ipAddress = ip_address
-    adaptermap.adapter.subnetMask = net_mask
-    adaptermap.adapter.gateway = net_ip_gw
-    globalip.dnsServerList = dns_server
-    globalip.IPSetings.dnsServerList = ['172.20.20.20', '192.168.245.20']
+    adaptermap.adapter.ip.ipAddress = ip_address_
+    adaptermap.adapter.subnetMask = netmask_
+    adaptermap.adapter.gateway = gw_ipaddres_
     adaptermap.adapter.dnsDomain = dns_prefix
     globalip = vim.vm.customization.GlobalIPSettings()
+    globalip.IPSetings.dnsServerList = ['172.20.20.20', '192.168.245.20']
     ident = vim.vm.customization.LinuxPrep(domain='srv.local', hostName=vim.vm.customization.FixedName(name=vm_name))
     customspec = vim.vm.customization.Specification()
     customspec.identity = ident
     customspec.nicSettingMap = [adaptermap]
     customspec.globalIPSettings = globalip
     task = vm.Customize(spec=customspec)
-
 
 def windows_change_ip():
     #https://github.com/vmware/pyvmomi/issues/261
@@ -119,15 +121,19 @@ def windows_change_ip():
     globalip = vim.vm.customization.GlobalIPSettings()
     adaptermap.adapter = vim.vm.customization.IPSettings()
     adaptermap.adapter.ip = vim.vm.customization.FixedIp()
-    adaptermap.adapter.ip.ipAddress = new_ip
-    adaptermap.adapter.subnetMask = new_mask
-    adaptermap.adapter.gateway = new_gw_ip
+    adaptermap.adapter.ip.ipAddress = ip_address_
+    adaptermap.adapter.subnetMask = netmask_
+    adaptermap.adapter.gateway = gw_ipaddres_
     adaptermap.adapter.dnsDomain = dns_prefix
     adaptermap.adapter.dnsServerList = ['172.20.20.20', '192.168.245.20']
     globalip = vim.vm.customization.GlobalIPSettings()
     #globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
     ident = vim.vm.customization.Sysprep()
     ident.guiUnattended = vim.vm.customization.GuiUnattended()
+    #ident.guiUnattended.autoLogon = False
+    ident.guiUnattended.password = vim.vm.customization.Password()
+    ident.guiUnattended.password.plainText = True
+    ident.guiUnattended.password.value = 'qwerty$4'
     ident.userData = vim.vm.customization.UserData()
     ident.userData.fullName = vm_name
     ident.userData.orgName = "Rtech"
@@ -141,180 +147,13 @@ def windows_change_ip():
     task = vm.Customize(spec=customspec)
 
 
-
-
-
-
-
-#
-# inputs = {'vcenter_ip': 'vc-linx',
-#           'vcenter_password': 'Password123',
-#           'vcenter_user': 'Administrator',
-#           'vm_name': 'hosturl',
-#           'isDHCP': False,
-#           'vm_ip': '192.168.222.203',
-#           'subnet': '255.255.255.0',
-#           'gateway': '192.168.222.1',
-#           'dns': ['172.10.10.10', '192.168.245.50'],
-#           'domain': 'srv.local'
-#           }
-#
-#
-# def get_obj(content, vimtype, name):
-#     """
-#      Get the vsphere object associated with a given text name
-#     """
-#     obj = None
-#     container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
-#     for c in container.view:
-#         if c.name == name:
-#             obj = c
-#             break
-#     return obj
-#
-#
-# def wait_for_task(task, actionName='job', hideResult=False):
-#     """
-#     Waits and provides updates on a vSphere task
-#     """
-#
-#     while task.info.state == vim.TaskInfo.State.running:
-#         time.sleep(2)
-#
-#     if task.info.state == vim.TaskInfo.State.success:
-#         if task.info.result is not None and not hideResult:
-#             out = '%s completed successfully, result: %s' % (actionName, task.info.result)
-#             print
-#             out
-#         else:
-#             out = '%s completed successfully.' % actionName
-#             print
-#             out
-#     else:
-#         out = '%s did not complete successfully: %s' % (actionName, task.info.error)
-#         raise task.info.error
-#         print
-#         out
-#
-#     return task.info.result
-#
-#
-# def main():
-#     # args = GetArgs()
-#     try:
-#         si = None
-#         try:
-#             print("Trying to connect to VCENTER SERVER . . .")
-#             si = connect.SmartConnectNoSSL(host='vc-linx.srv.local', user='nokhrimenko@phoenixit.ru', pwd='NikolonsO345831', port=443)
-#         except:
-#             pass
-#             #atexit.register(Disconnect, si)
-#
-#         print("Connected to VCENTER SERVER !")
-#
-#         content = si.RetrieveContent()
-#
-#         # vm_name = args.vm
-#         vm_name = inputs['vm_name']
-#         vm = get_obj(content, [vim.VirtualMachine], vm_name)
-#
-#         if vm.runtime.powerState != 'poweredOff':
-#             print("WARNING:: Power off your VM before reconfigure")
-#             sys.exit()
-#
-#         adaptermap = vim.vm.customization.AdapterMapping()
-#         globalip = vim.vm.customization.GlobalIPSettings()
-#         adaptermap.adapter = vim.vm.customization.IPSettings()
-#
-#         isDHDCP = inputs['isDHCP']
-#         if not isDHDCP:
-#             """Static IP Configuration"""
-#             adaptermap.adapter.ip = vim.vm.customization.FixedIp()
-#             adaptermap.adapter.ip.ipAddress = inputs['vm_ip']
-#             adaptermap.adapter.subnetMask = inputs['subnet']
-#             adaptermap.adapter.gateway = inputs['gateway']
-#             globalip.dnsServerList = inputs['dns']
-#
-#         else:
-#             """DHCP Configuration"""
-#             adaptermap.adapter.ip = vim.vm.customization.DhcpIpGenerator()
-#
-#         adaptermap.adapter.dnsDomain = inputs['domain']
-#
-#         globalip = vim.vm.customization.GlobalIPSettings()
-#
-#         # For Linux . For windows follow sysprep
-#         ident = vim.vm.customization.LinuxPrep(domain=inputs['domain'], hostName=vim.vm.customization.FixedName(name=vm_name))
-#
-#
-#
-#         customspec = vim.vm.customization.Specification()
-#         # For only one adapter
-#         customspec.identity = ident
-#         customspec.nicSettingMap = [adaptermap]
-#         customspec.globalIPSettings = globalip
-#
-#         # Configuring network for a single NIC
-#         # For multipple NIC configuration contact me.
-#
-#         print("Reconfiguring VM Networks . . .")
-#
-#         task = vm.Customize(spec=customspec)
-#
-#         # Wait for Network Reconfigure to complete
-#         wait_for_task(task, si)
-#
-#
-#
-#
-#
-# # Start program
-# if __name__ == "__main__":
-#     main()
-#
-# si = connect.SmartConnectNoSSL(host='vc-linx.srv.local', user='nokhrimenko@phoenixit.ru', pwd='NikolonsO345831', port=443)
-#
-# content = si.RetrieveContent()
-# vm_name = 'host-test'
-#
-# def get_obj(content, vimtype, name):
-#     """
-#      Get the vsphere object associated with a given text name
-#     """
-#     obj = None
-#     container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
-#     for c in container.view:
-#         if c.name == name:
-#             obj = c
-#             break
-#     return obj
-#
-#
-#
-# vm = get_obj(content, [vim.VirtualMachine], vm_name)
-#
-#
-# adaptermap = vim.vm.customization.AdapterMapping()
-# globalip = vim.vm.customization.GlobalIPSettings()
-# adaptermap.adapter = vim.vm.customization.IPSettings()
-# adaptermap.adapter.ip = vim.vm.customization.FixedIp()
-# adaptermap.adapter.ip.ipAddress = '192.168.222.203'
-# adaptermap.adapter.subnetMask = '255.255.255.0'
-# adaptermap.adapter.gateway = '192.168.222.1'
-# globalip.dnsServerList = ['172.10.10.10', '192.168.245.50']
-# adaptermap.adapter.dnsDomain = 'srv.ru'
-# globalip = vim.vm.customization.GlobalIPSettings()
-# #hostname_ = vim.vm.customization.FixedName(name=vm_name)
-# ident = vim.vm.customization.LinuxPrep(domain='srv.local', hostName=vim.vm.customization.FixedName(name=vm_name))
-#
-#
-#
-# ident = vim.vm.customization.Sysprep(hostName = 'test', guiUnattended=vim.vm.customization.GuiUnattended(), userData = vim.vm.customization.UserData(computerName = vim.vm.customization.NameGenerator(), identification = vim.vm.customization.Identification()))
-# customspec = vim.vm.customization.Specification()
-# customspec.identity = ident
-# customspec.nicSettingMap = [adaptermap]
-# customspec.globalIPSettings = globalip
-# task = vm.Customize(spec=customspec)
-#
-# task = vm.Customize(spec=customspec)
+def main(hostname, cidr, infraname):
+    ip_address_ = ipam_create_ip(hostname, infraname, cidr)
+    gw_ipaddres_ = re.sub('[/]', '', cidr)[:-3] + '1'
+    netmask_ = '255.255.255.0'
+    dns_prefix = 'srv.local'
+    power_off()
+    guest_os()
+    change_port_group(cidr)
+    power_on()
 
