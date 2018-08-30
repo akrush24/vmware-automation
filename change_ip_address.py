@@ -5,6 +5,7 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 from passwd import user_api, pass_api, vc_user, vc_pass
 import requests
+import re
 
 # get ip address
 def ipam_create_ip(hostname, infraname, cidr):
