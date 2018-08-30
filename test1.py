@@ -5,11 +5,7 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 import re
 
-vc_host = 'vc-linx.srv.local'
-vc_user = 'nokhrimenko@phoenixit.ru'
-vc_pass = 'NikolonsO345831'
-new_ip = '192.168.222.184'
-new_mask = '255.255.255.0'
+
 new_gw_ip = re.sub('[/]', '', cidr)[:-3] + '1'
 dns_prefix = 'srv.local'
 vm_name = 'host-test'
