@@ -104,7 +104,7 @@ def linux_change_ip():
     adaptermap.adapter.gateway = gw_ipaddres_
     adaptermap.adapter.dnsDomain = dns_prefix
     globalip = vim.vm.customization.GlobalIPSettings()
-    globalip.IPSetings.dnsServerList = ['172.20.20.20', '192.168.245.20']
+    globalip.IPSetings.dnsServerList = dns_servers_
     ident = vim.vm.customization.LinuxPrep(domain='srv.local', hostName=vim.vm.customization.FixedName(name=vm_name))
     customspec = vim.vm.customization.Specification()
     customspec.identity = ident
@@ -125,7 +125,7 @@ def windows_change_ip():
     adaptermap.adapter.subnetMask = netmask_
     adaptermap.adapter.gateway = gw_ipaddres_
     adaptermap.adapter.dnsDomain = dns_prefix
-    adaptermap.adapter.dnsServerList = ['172.20.20.20', '192.168.245.20']
+    adaptermap.adapter.dnsServerList = dns_servers_
     globalip = vim.vm.customization.GlobalIPSettings()
     #globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
     ident = vim.vm.customization.Sysprep()
@@ -152,6 +152,7 @@ def main(hostname, cidr, infraname):
     gw_ipaddres_ = re.sub('[/]', '', cidr)[:-3] + '1'
     netmask_ = '255.255.255.0'
     dns_prefix = 'srv.local'
+    dns_servers_ = ['172.20.20.20', '192.168.245.20']
     power_off()
     guest_os()
     change_port_group(cidr)
