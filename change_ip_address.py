@@ -5,16 +5,84 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 
 
-def power_off_on():
+
+
+
+def power_off():
+    if vm.runtime.powerState != 'poweredOff':
+        vm.PowerOff()
+
+
+
+def power_on():
+    if vm.runtime.powerState == 'poweredOff':
+        vm.PowerOn()
+
+
+
 
 
 
 def change_port_group():
-   # https: // github.com / vmware / pyvmomi - community - samples / blob / master / samples / change_vm_vif.py
 
-def guest_os():
+    def portgroup(cidr):
+        port_int = {'192.168.222.0/24': '192.168.222',
+                    '192.168.199.0/24': '192.168.199',
+                    '192.168.245.0/24': '245',
+                    '192.168.14.0/23': 'VLAN14'}
 
 
+
+    vm = get_obj(content, [vim.VirtualMachine], vm_name)
+    content = si.RetrieveContent()
+
+
+
+    device_change = []
+    for device in vm.config.hardware.device:
+
+        if isinstance(device, vim.vm.device.VirtualEthernetCard):
+            nicspec = vim.vm.device.VirtualDeviceSpec()
+            nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+            nicspec.device = device
+            nicspec.device.wakeOnLanEnabled = True
+        if not args.is_VDS:
+            nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
+            nicspec.device.backing.network = get_obj(content, [vim.Network], vm_new_portgroup)
+            nicspec.device.backing.deviceName = vm_new_portgroup
+        else:
+            network = get_obj(content, [vim.dvs.DistributedVirtualPortgroup], vm_net_portgroup)
+            dvs_port_connection = vim.dvs.PortConnection()
+            dvs_port_connection.portgroupKey = network.key
+            dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
+            nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
+            nicspec.device.backing.port = dvs_port_connection
+
+        nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+        nicspec.device.connectable.startConnected = True
+        nicspec.device.connectable.allowGuestControl = True
+        device_change.append(nicspec)
+        break
+
+    config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
+    task = vm.ReconfigVM_Task(config_spec)
+
+
+
+
+
+   # https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/change_vm_vif.py
+
+def guest_os(vm_name):
+    windows = ['windows7Server64Guest', 'windows8Server64Guest']
+    linux = ['centos64Guest', 'centos7_64Guest', 'ubuntu64Guest']
+    vm_os = vm.guest.guestId
+    if vm_os in windows:
+        return
+    elif vm_os in linux:
+        return
+    else:
+        print("No support OS")
 
 
 def get_obj(content, vimtype, name):
@@ -25,9 +93,6 @@ def get_obj(content, vimtype, name):
             obj = c
             break
     return obj
-
-
-
 
 
 def linux_change_ip(vm_name, new_ip):
@@ -73,9 +138,6 @@ def windows_change_ip(vm_name, new_ip):
     ident.userData.computerName = vim.vm.customization.FixedName()
     ident.userData.computerName.name = vm_name
     ident.identification = vim.vm.customization.Identification()
-
-
-
 
 
 
