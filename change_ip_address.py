@@ -123,8 +123,9 @@ def windows_change_ip():
     adaptermap.adapter.subnetMask = new_mask
     adaptermap.adapter.gateway = new_gw_ip
     adaptermap.adapter.dnsDomain = dns_prefix
+    adaptermap.adapter.dnsServerList = ['172.20.20.20', '192.168.245.20']
     globalip = vim.vm.customization.GlobalIPSettings()
-    globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
+    #globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
     ident = vim.vm.customization.Sysprep()
     ident.guiUnattended = vim.vm.customization.GuiUnattended()
     ident.userData = vim.vm.customization.UserData()
