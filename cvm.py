@@ -33,7 +33,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
-    template_linux = ['template_centos7.3', 'template_ubuntu16.04']
+    template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template']
     template_wind = ['template_wind2012', 'template_wind2008']
     if vm_template in template_linux:
         ter_dir = './linux'
@@ -53,7 +53,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     def portgroup(cidr):
         port_int = {'192.168.222.0/24': '192.168.222',
                     '192.168.199.0/24': '192.168.199',
-                    '192.168.245.0/24': '245',
+                    '192.168.245.0/24': '192.168.245',
                     '192.168.189.0/24': '192.168.189_uni',
                     '192.168.14.0/23': 'VLAN14'}
 
@@ -81,6 +81,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
         os.remove(ter_dir+"/terraform.tfstate")
+        print("Teraform state file removed")
     else:
         print("Teraform state file is't Exist")
 
