@@ -31,13 +31,13 @@ parser.add_argument('--vcenter', dest='vcenter', help='vCenter URL')
 
 args = parser.parse_args()
 
-if args.folder is None:
-    print("Please enter Folder name");
-    quit()
+#if args.folder is None and args.onlyip is not 'yes':
+#    print("Please enter Folder name");
+#    quit()
 
-if args.template is None:
-    print("Please enter VM Template");
-    quit()
+#if args.template is None and args.onlyip is not 'yes':
+#    print("Please enter VM Template");
+#    quit()
 
 if args.onlyip is not 'No':
     ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);

@@ -54,6 +54,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
         port_int = {'192.168.222.0/24': '192.168.222',
                     '192.168.199.0/24': '192.168.199',
                     '192.168.245.0/24': '245',
+                    '192.168.189.0/24': '192.168.189_uni',
                     '192.168.14.0/23': 'VLAN14'}
 
         if port_int[cidr]:
