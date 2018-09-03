@@ -20,6 +20,16 @@ def ipam_create_ip(hostname, infraname, cidr):
        headers = {'token':token}
        cidr_url = 'http://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
        get_sudnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+
+       # временный обход для дублированных сетей (24,14,9)
+       if cidr == '192.168.24.0/24':
+          get_sudnet_id = '130'
+       elif cidr == '192.168.9.0/24':
+          get_sudnet_id = '131'
+       elif cidr == '192.168.14.0/23': 
+          get_sudnet_id = '129'
+       ####
+
        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_sudnet_id
        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
@@ -55,7 +65,9 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.199.0/24': '192.168.199',
                     '192.168.245.0/24': '192.168.245',
                     '192.168.189.0/24': '192.168.189_uni',
-                    '192.168.14.0/23': 'VLAN14'}
+                    '192.168.14.0/23': 'VLAN14',
+                    '192.168.24.0/24': 'VLAN24' # ATC vcenter.at-consulting.ru
+}
 
         if port_int[cidr]:
             vm_portgroup = port_int.get(cidr)
