@@ -2,7 +2,7 @@
 набор скриптов для упращения развертывания виртуальныз машин в инфраструктуре vsphere
 
 ## INSTALLATION ##
- * pip3 install pyVim
+ * pip3 install pyVim pyVmomi requests paramiko python_terraform requests
 
 ### Create New PHPIpam IP ###
 ```
@@ -15,7 +15,7 @@
 
 ### Credentials ###
 ```
-cat >> passwd.py<EOF
+cat >passwd.py<<EOF
 user_api = ''
 pass_api = ''
 vc_user  = ''

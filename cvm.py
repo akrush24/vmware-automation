@@ -66,7 +66,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.245.0/24': '192.168.245',
                     '192.168.189.0/24': '192.168.189_uni',
                     '192.168.14.0/23': 'VLAN14',
-                    '192.168.24.0/24': 'VLAN24' # ATC vcenter.at-consulting.ru
+                    '192.168.24.0/24': 'VLAN24-192.168.24.0' # ATC vcenter.at-consulting.ru
 }
 
         if port_int[cidr]:
