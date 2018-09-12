@@ -44,7 +44,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
-    template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template', 'template_centos6.8_x86_64']
+    template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template', 'template_centos6.8_x86_64', 'template_debian9']
     template_wind = ['template_wind2012', 'template_wind2008']
     if vm_template in template_linux:
         ter_dir = './linux'
