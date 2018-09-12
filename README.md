@@ -4,7 +4,7 @@
 ## INSTALLATION ##
  * pip3 install pyVim pyVmomi requests paramiko python_terraform requests
 
-### Create New PHPIpam IP ###
+### Create Only New PHPIpam IP ###
 ```
 ./run.py \
 --vmname=test-vm01 \

@@ -18,7 +18,7 @@ def ipam_create_ip(hostname, infraname, cidr):
     try:
        token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
        headers = {'token':token}
-       cidr_url = 'http://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
+       cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
        get_sudnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
 
        # временный обход для дублированных сетей (24,14,9)
@@ -35,9 +35,10 @@ def ipam_create_ip(hostname, infraname, cidr):
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
+          print ("IP: ", ip)
           return ip  # get ip address
     except:
-       print("При выделении IP произошла ошибка!")
+       print("При выделении IP произошла ошибка! ",sys.exc_info())
        quit()
 
 
@@ -142,8 +143,9 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
 
 
 def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template,
-         vm_cpu, vm_ram, vm_disk_size, folder_vm):
-    ip = ipam_create_ip(hostname, infraname, cidr)
+         vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
+    if ip is None:
+       ip = ipam_create_ip(hostname, infraname, cidr)
     ter_dir = template(vm_template)
     create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size)
