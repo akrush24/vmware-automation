@@ -143,19 +143,40 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
 
 
 
-def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template,
-         vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
+def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
+
+    # remove teraform state file
+    if os.path.exists(ter_dir+"/terraform.tfstate"):
+        os.remove(ter_dir+"/terraform.tfstate")
+        print("Teraform state file exist, removed.")
+    else:
+        print("Teraform state file is't Exist, it's OK.")
+
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
     else:
        print ("IP: ["+ip+"]")
 
     ter_dir = template(vm_template)
-    create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
-                        vm_cpu, vm_ram, vm_disk_size)
-    notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
-    move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
 
+    try:
+       create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size)
+       print ("VM is Ready: ["+hostname+" : "+ip+"]")
+    except:
+       print ("ERROR in create_vm_terraform: ",sys.exc_info())
+       quit()
+
+    try:
+       notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
+       print ("Edit nodes to: ["+infraname+"]")
+    except:
+       print ("ERROR: notes_write_vm: ",sys.exc_info())
+
+    try:
+       move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
+       print ("Move VM to: ["+folder_vm+"]")
+    except:
+       print ("ERROR: move_vm_to_folder: ",sys.exc_info())
 
 
 
