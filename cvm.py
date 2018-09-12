@@ -35,7 +35,7 @@ def ipam_create_ip(hostname, infraname, cidr):
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
-          print ("IP: ", ip)
+          print ("IP: ["+ip+"]")
           return ip  # get ip address
     except:
        print("При выделении IP произошла ошибка! ",sys.exc_info())
@@ -69,8 +69,9 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.199.0/24': '192.168.199',
                     '192.168.245.0/24': '192.168.245',
                     '192.168.189.0/24': '192.168.189_uni',
-                    '192.168.14.0/23': 'VLAN14',
-                    '192.168.24.0/24': 'VLAN24-192.168.24.0' # ATC vcenter.at-consulting.ru
+                    '192.168.14.0/23' : 'VLAN14',
+                    '192.168.24.0/24' : 'VLAN24-192.168.24.0', # ATC vcenter.at-consulting.ru
+                    '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0' # ATC vcenter.at-consulting.ru
 }
 
         if port_int[cidr]:
@@ -146,12 +147,14 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
          vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
+    else:
+       print ("IP: ["+ip+"]")
+
     ter_dir = template(vm_template)
     create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size)
     notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
     move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
-    print ("####### IP: "+ip+" #######")
 
 
 
