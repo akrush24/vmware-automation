@@ -44,7 +44,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
-    template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template', 'template_centos6.8_x86_64']
+    template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template', 'template_centos6.8_x86_64', 'centos-7-es-5.1.1-template']
     template_wind = ['template_wind2012', 'template_wind2008']
     if vm_template in template_linux:
         ter_dir = './linux'
@@ -97,10 +97,12 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                                                    'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
                                                    'vm_netmask': vm_netmask})
     kwargs = {"auto-approve": True}
-    print(kwargs)
+    #print(kwargs)
     tf.init()
-    print(tf.plan())
-    print(tf.apply(**kwargs))
+    #print(tf.plan())
+    tf.plan()
+    #print(tf.apply(**kwargs))
+    tf.apply(**kwargs)
 
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
@@ -145,19 +147,20 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
 
 def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
 
+    ter_dir = template(vm_template)
+
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
-        os.remove(ter_dir+"/terraform.tfstate")
-        print("Teraform state file exist, removed.")
+       os.remove(ter_dir+"/terraform.tfstate")
+       print("Teraform state file exist, removed.")
     else:
-        print("Teraform state file is't Exist, it's OK.")
+       print("Teraform state file is't Exist, it's OK.")
 
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
     else:
        print ("IP: ["+ip+"]")
 
-    ter_dir = template(vm_template)
 
     try:
        create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size)
