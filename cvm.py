@@ -35,7 +35,6 @@ def ipam_create_ip(hostname, infraname, cidr):
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
-          print ("### IP: ["+ip+"]")
           return ip  # get ip address
     except:
        print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
@@ -158,8 +157,9 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
 
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
+       print ("### NEW IPAM IP is: ["+ip+"]")
     else:
-       print ("### IP: ["+ip+"]")
+       print ("### YOUR IP is: ["+ip+"]")
 
 
     try:
