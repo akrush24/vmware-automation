@@ -54,6 +54,8 @@ resource "vsphere_virtual_machine" "vm" {
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
 
+  dns_servers = "192.168.32.10"
+
   num_cpus = "${var.vm_cpu}"
   memory   = "${var.vm_ram}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
