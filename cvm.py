@@ -35,27 +35,27 @@ def ipam_create_ip(hostname, infraname, cidr):
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
-          print ("IP: ["+ip+"]")
+          print ("### IP: ["+ip+"]")
           return ip  # get ip address
     except:
-       print("При выделении IP произошла ошибка! ",sys.exc_info())
+       print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
        quit()
 
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
     template_linux = ['template_centos7.3', 'template_ubuntu16.04', 'centos7.0-clear-v2-template', 'template_centos6.8_x86_64', 'centos-7-es-5.1.1-template', 'template_debian9']
-    template_wind = ['template_wind2012', 'template_wind2008']
+    template_wind = ['template_wind2012', 'template_wind2008', 'template_WinSrv2012R2RU']
     if vm_template in template_linux:
         ter_dir = './linux'
-        print ("##### TER DIR: """+ter_dir+" ##########")
+        print ("### TER DIR: ["""+ter_dir+"]")
         return ter_dir
     elif vm_template in template_wind:
         ter_dir = './windows'
-        print ("##### TER DIR: """+ter_dir+" ##########")
+        print ("### TER DIR: ["+ter_dir+"]")
         return ter_dir
     else:
-        print ('no template')
+        print ('!!! No template!')
 
 
 #varible5
@@ -78,7 +78,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
             vm_portgroup = port_int.get(cidr)
             return vm_portgroup
         else:
-            print ('no network portgroup')
+            print ('!!! No network portgroup!')
 
 
     # remove teraform state file
@@ -107,9 +107,9 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
         os.remove(ter_dir+"/terraform.tfstate")
-        print("Teraform state file removed")
+        print("### Teraform state file removed")
     else:
-        print("Teraform state file is't Exist")
+        print("### Teraform state file is't Exist")
 
 
 #change folder, write notes
@@ -152,34 +152,34 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
        os.remove(ter_dir+"/terraform.tfstate")
-       print("Teraform state file exist, removed.")
+       print("!!! Teraform state file exist, removed.")
     else:
-       print("Teraform state file is't Exist, it's OK.")
+       print("### Teraform state file is't Exist, it's OK.")
 
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
     else:
-       print ("IP: ["+ip+"]")
+       print ("### IP: ["+ip+"]")
 
 
     try:
        create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size)
-       print ("VM is Ready: ["+hostname+" : "+ip+"]")
+       print ("### VM is Ready: ["+hostname+" : "+ip+"]")
     except:
-       print ("ERROR in create_vm_terraform: ",sys.exc_info())
+       print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
        quit()
 
     try:
        notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
-       print ("Edit nodes to: ["+infraname+"]")
+       print ("### Edit nodes to: ["+infraname+"]")
     except:
-       print ("ERROR: notes_write_vm: ",sys.exc_info())
+       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
 
     try:
        move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
-       print ("Move VM to: ["+folder_vm+"]")
+       print ("### Move VM to: ["+folder_vm+"]")
     except:
-       print ("ERROR: move_vm_to_folder: ",sys.exc_info())
+       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
 
 
 
