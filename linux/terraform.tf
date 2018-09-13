@@ -23,7 +23,6 @@ provider "vsphere" {
   allow_unverified_ssl = true
 }
 
-
 data "vsphere_datacenter" "dc" {
   name = "${var.vc_dc}"
 }
@@ -54,7 +53,6 @@ resource "vsphere_virtual_machine" "vm" {
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
 
-  dns_servers = "192.168.32.10"
 
   num_cpus = "${var.vm_cpu}"
   memory   = "${var.vm_ram}"
@@ -90,6 +88,7 @@ resource "vsphere_virtual_machine" "vm" {
       }
 
       ipv4_gateway = "${var.vm_ip_gw}"
+      dns_server_list = ["192.168.32.10", "192.168.10.2"]
     }
   }
 

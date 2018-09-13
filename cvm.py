@@ -19,20 +19,24 @@ def ipam_create_ip(hostname, infraname, cidr):
        token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
        headers = {'token':token}
        cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
-       get_sudnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+       get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
 
        # временный обход для дублированных сетей (24,14,9)
        if cidr == '192.168.24.0/24':
-          get_sudnet_id = '130'
+          get_subnet_id = '130'
        elif cidr == '192.168.9.0/24':
-          get_sudnet_id = '131'
+          get_subnet_id = '131'
        elif cidr == '192.168.14.0/23': 
-          get_sudnet_id = '129'
+          get_subnet_id = '129'
+       elif cidr == '192.168.194.0/24':
+          get_subnet_id = '132'
        ####
 
-       get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_sudnet_id
+       print ("### SUBnet ID: ["+get_subnet_id+"]")
+
+       get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
-       create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_sudnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
+       create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
           return ip  # get ip address
@@ -59,7 +63,7 @@ def template(vm_template):
 
 #varible5
 def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
-                        vm_cpu, vm_ram, vm_disk_size ):
+                        vm_cpu, vm_ram, vm_disk_size, debug ):
     vm_ip_gw = re.sub('[/]', '', cidr)[:-3] + '1'  # get GW (example 192.168.222.1)
     vm_netmask = cidr[-2:]   # get prefix netmask (example /24)вд
 #get port_group_vm_interface  (return portgroup)
@@ -70,7 +74,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.189.0/24': '192.168.189_uni',
                     '192.168.14.0/23' : 'VLAN14',
                     '192.168.24.0/24' : 'VLAN24-192.168.24.0', # ATC vcenter.at-consulting.ru
-                    '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0' # ATC vcenter.at-consulting.ru
+                    '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0', # ATC vcenter.at-consulting.ru
                     '192.168.194.0/24': 'ds-VLAN_194' # ATC vcenter.at-consulting.ru
 }
 
@@ -90,12 +94,14 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                                                    'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
                                                    'vm_netmask': vm_netmask})
     kwargs = {"auto-approve": True}
-    #print(kwargs)
     tf.init()
-    #print(tf.plan())
-    tf.plan()
-    #print(tf.apply(**kwargs))
-    tf.apply(**kwargs)
+
+    if debug is not None: # is debug mode print all output
+       print(tf.plan())
+       print(tf.apply(**kwargs))
+    else:
+       tf.plan()
+       tf.apply(**kwargs)
 
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
@@ -138,7 +144,7 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
 
 
 
-def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip):
+def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug):
 
     ter_dir = template(vm_template)
 
@@ -157,7 +163,7 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
 
 
     try:
-       create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size)
+       create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
        print ("### VM is Ready: ["+hostname+" : "+ip+"]")
     except:
        print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
