@@ -97,6 +97,7 @@ resource "vsphere_virtual_machine" "vm" {
       }
 
       ipv4_gateway = "${var.vm_ip_gw}"
+      dns_server_list = ["8.8.8.8"]
     }
   }
 
