@@ -32,13 +32,14 @@ def ipam_create_ip(hostname, infraname, cidr):
           get_subnet_id = '132'
        ####
 
-       print ("### SUBnet ID: ["+get_subnet_id+"]")
+       print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
 
        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
        create = requests.post(url = create_url , headers=headers).json()['success']
        if create == True:
+          print ("### NEW IP for ["+hostname+"] is: ["+ip+"]")
           return ip  # get ip address
     except:
        print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
@@ -129,6 +130,7 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
     folder_dc = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
                   'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
                   'vc-khut.srv.local': 'Datacenter-KHUT/vm/',
+                  'khut-vc01.srv.local': 'Khutorskaya/vm/',
                   'vcenter.at-consulting.ru': 'SAV/vm/'}.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
@@ -157,7 +159,6 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
 
     if ip is None:
        ip = ipam_create_ip(hostname, infraname, cidr)
-       print ("### NEW IPAM IP is: ["+ip+"]")
     else:
        print ("### YOUR IP is: ["+ip+"]")
 

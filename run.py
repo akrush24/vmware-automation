@@ -13,7 +13,7 @@ parser.add_argument('--net', '-l',  dest='net',     help="Network (ex. --net 192
 parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist "--net" not required')
 parser.add_argument('--vmname', '-n',   dest='vmname',  help="VM name (ex. --vmname vm-01)", required=True)
 parser.add_argument('--datastor', '-ds', dest='ds',      help="Datastore name")
-parser.add_argument('--folde', dest='folder',  help='VM Folder in vCenter')
+parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
 parser.add_argument('--cluster', '-cl', dest='cluster',  help='vSphere Cluster')
 
@@ -44,7 +44,6 @@ args = parser.parse_args()
 
 if args.onlyip is not 'No':
     ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
-    print ("### NEW IPAM IP is: ["+ip+"]")
 else:
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
