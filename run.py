@@ -10,7 +10,7 @@ version = '0.0.1'
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--net', '-l',  dest='net',     help="Network (ex. --net 192.168.0.0/24). Auto assign IP addres from IPAM", required=True)
-parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist "--net" not required')
+parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--vmname', '-n',   dest='vmname',  help="VM name (ex. --vmname vm-01)", required=True)
 parser.add_argument('--datastor', '-ds', dest='ds',      help="Datastore name")
 parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter')

@@ -38,22 +38,25 @@ EOF
 
 ### HELP ###
 ```
- ./run.py -h
-usage: run.py [-h] --net NET --vmname VMNAME [--datastor DS] [--folde FOLDER]
-              [--datacenter DATACENTER] [--cluster CLUSTER] [--dsize DSIZE]
-              [--msize MEM] [--cpu CPU] --desc DESC [--template TEMPLATE]
-              [--onlyip ONLYIP] [--version] [--vcenter VCENTER]
+./run.py -h
+usage: run.py [-h] --net NET [--ip IP] --vmname VMNAME [--datastor DS]
+              [--folder FOLDER] [--datacenter DATACENTER] [--cluster CLUSTER]
+              [--dsize DSIZE] [--msize MEM] [--cpu CPU] --desc DESC
+              [--template TEMPLATE] [--onlyip ONLYIP] [--version]
+              [--vcenter VCENTER] [--debug DEBUG]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --net NET, -l NET     Network (ex. --net 192.168.0.0/24
+  --net NET, -l NET     Network (ex. --net 192.168.0.0/24). Auto assign IP
+                        addres from IPAM
+  --ip IP               IP Address. If IP exist ip is not taken from IPAM
   --vmname VMNAME, -n VMNAME
                         VM name (ex. --vmname vm-01)
   --datastor DS, -ds DS
-                        Datastore
-  --folde FOLDER        VM Folder in vCenter
+                        Datastore name
+  --folder FOLDER       VM Folder in vCenter
   --datacenter DATACENTER, -dc DATACENTER
-                        vSphere Datacenter
+                        vSphere Datacenter name
   --cluster CLUSTER, -cl CLUSTER
                         vSphere Cluster
   --dsize DSIZE, -hdd DSIZE
@@ -63,7 +66,9 @@ optional arguments:
   --desc DESC, -d DESC  Description
   --template TEMPLATE, -tm TEMPLATE
                         VM Template
-  --onlyip ONLYIP       Only IP allocation (ex. --onlyip yes
+  --onlyip ONLYIP       Only IP allocation (ex. --onlyip yes)
   --version, -V         show program's version number and exit
   --vcenter VCENTER     vCenter URL
+  --debug DEBUG         debug mode
+
 ```
