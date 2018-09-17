@@ -17,8 +17,8 @@ parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
 parser.add_argument('--cluster', '-cl', dest='cluster',  help='vSphere Cluster')
 
-parser.add_argument('--dsize', '-hdd', dest='dsize',   help='Disk Size')
-parser.add_argument('--msize', '-m', dest='mem',   help='RAM Size')
+parser.add_argument('--dsize', '--hdd', '-hdd', dest='dsize',   help='Disk Size')
+parser.add_argument('--msize', '--mem', '--ram', '-m', dest='mem',   help='RAM Size')
 parser.add_argument('--cpu', '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc', '-d', dest='desc',    help='Description', required=True)
 parser.add_argument('--template', '-tm', dest='template',    help='VM Template')
@@ -45,6 +45,20 @@ args = parser.parse_args()
 if args.onlyip is not 'No':
     ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
 else:
+    # check on the fool
+    if args.vcenter is None:
+       print("Please enter Vcenter Name")
+       quit()
+    if args.cluster is None: 
+       print("Please enter Vcenter Cluster Name")
+       quit()
+    if args.datacenter is None: 
+       print("Please enter Vcenter DataCenter Name")
+       quit()
+    if args.ds is None:
+       print("Please enter Vcenter DataStore Name")
+       quit()
+
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, 
