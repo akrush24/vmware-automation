@@ -59,7 +59,7 @@ def template(vm_template):
         print ("### TER DIR: ["+ter_dir+"]")
         return ter_dir
     else:
-        print ('!!! No template!')
+        print ('!!! No template found'+vm_template+'!')
         quit()
 
 
