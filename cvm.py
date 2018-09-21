@@ -21,17 +21,6 @@ def ipam_create_ip(hostname, infraname, cidr):
        cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
        get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
 
-       # временный обход для дублированных сетей (24,14,9)
-       if cidr == '192.168.24.0/24':
-          get_subnet_id = '130'
-       elif cidr == '192.168.9.0/24':
-          get_subnet_id = '131'
-       elif cidr == '192.168.14.0/23': 
-          get_subnet_id = '129'
-       elif cidr == '192.168.194.0/24':
-          get_subnet_id = '132'
-       ####
-
        print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
 
        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
@@ -49,7 +38,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
     template_linux = ['template_centos7.3','template_ubuntu16.04','centos7.0-clear-v2-template','template_centos6.8_x86_64','centos-7-es-5.1.1-template','template_debian9','template_centos7.5_x86_64']
-    template_wind = ['template_wind2012','template_wind2008','template_WinSrv2012R2RU', 'template_winsrv2012r2ru', 'template_WinSrv2012R2']
+    template_wind = ['template_wind2012','template_wind2008','template_WinSrv2012R2RU', 'template_winsrv2012r2ru', 'template_WinSrv2012R2', 'temp_w7_x64']
     if vm_template in template_linux:
         ter_dir = './linux'
         print ("### TER DIR: ["""+ter_dir+"]")

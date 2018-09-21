@@ -59,6 +59,10 @@ else:
        print("Please enter Vcenter DataStore Name")
        quit()
 
+    if args.cpu   is None: args.cpu = 2
+    if args.mem   is None: args.mem = 2048
+    if args.dsize is None: args.dsize = 50
+
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, 
