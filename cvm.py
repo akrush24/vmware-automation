@@ -96,7 +96,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                                                    'vm_hostname': hostname, 'vm_cpu': vm_cpu, 'vm_ram': vm_ram,
                                                    'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
                                                    'vm_netmask': vm_netmask})
-    kwargs = {"auto-approve": True}
+    #kwargs = {"auto-approve": True}
 
     try:
        if debug is not None: # is debug mode print all output
@@ -107,8 +107,6 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
        print ("!!! ERROR in create_vm_terraform(tf.init()): ",sys.exc_info())
        quit()
 
-#    tf.init()
-	
     try:
        if debug is not None: # is debug mode print all output
           print(tf.plan())
@@ -122,7 +120,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
        if debug is not None: # is debug mode print all output
           print(tf.apply())
        else:
-          tf.plan()
+          tf.apply()
     except:
        print ("!!! ERROR in create_vm_terraform(tf.apply()): ",sys.exc_info())
        quit()
