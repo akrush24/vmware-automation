@@ -21,6 +21,17 @@ def ipam_create_ip(hostname, infraname, cidr):
        cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
        get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
 
+       # временный обход для дублированных сетей (24,14,9)
+       if cidr == '192.168.24.0/24':
+          get_subnet_id = '130'
+       elif cidr == '192.168.9.0/24':
+          get_subnet_id = '131'
+       elif cidr == '192.168.14.0/23': 
+          get_subnet_id = '129'
+       elif cidr == '192.168.194.0/24':
+          get_subnet_id = '132'
+       ####
+
        print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
 
        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
