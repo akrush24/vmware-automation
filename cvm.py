@@ -59,7 +59,17 @@ def template(vm_template):
         print ("### TER DIR: ["+ter_dir+"]")
         return ter_dir
     else:
-        print ('!!! No template found'+vm_template+'!')
+        print ('!!! No template found: '+vm_template+'!')
+        i=1
+        print("For Linux: ")
+        for template in template_linux:
+           print ("   "+str(i)+". "+template)
+           i=i+1
+        i=1
+        print("For Windows: ")
+        for template in template_wind:
+           print ("   "+str(i)+". "+template)
+           i=i+1
         quit()
 
 
