@@ -11,7 +11,7 @@ if [[ ${ANS} != ${HOST} ]];then echo Bay Bay;exit;fi
 
 ssh-keygen -R ${HOST}
 
-scp grow-root-partI.sh grow-root-partII.sh ${USER}@${HOST}:~/ || (ssh -o StrictHostKeyChecking=no ${USER}@${HOST} \
+scp grow-root-part*.sh ${USER}@${HOST}:~/ || (ssh -o StrictHostKeyChecking=no ${USER}@${HOST} \
 "which scp || (ls -l /etc/redhat-release && yum install -y openssh-clients);" && \
 scp grow-root-partI.sh grow-root-partII.sh ${USER}@${HOST}:~/)
 
@@ -19,23 +19,35 @@ ssh -o StrictHostKeyChecking=no ${USER}@${HOST} "/bin/bash ~/grow-root-partI.sh 
 
 sleep 30
 
-ping ${HOST} -c 2  &>/dev/null || (echo "#1: no ping :("; sleep 10)
-ping ${HOST} -c 2  &>/dev/null || (echo "#2: no ping :("; sleep 10)
-ping ${HOST} -c 2  &>/dev/null || (echo "#3: no ping :("; sleep 10)
-ping ${HOST} -c 2  &>/dev/null || (echo "#4: no ping :("; sleep 10)
-ping ${HOST} -c 2  &>/dev/null || (echo "#5: no ping :("; sleep 10)
-ping ${HOST} -c 2  &>/dev/null || (echo "#6: no ping..... The Server has DIED!";)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#1: no ping :("; sleep 10)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#2: no ping :("; sleep 10)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#3: no ping :("; sleep 10)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#4: no ping :("; sleep 20)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#5: no ping :("; sleep 20)
+#ping ${HOST} -c 2  &>/dev/null || (echo "#6: no ping..... The Server has DIED!";)
 
-for t in $(seq 5)
+
+for t in $(seq 10)
 do
-  ssh -o StrictHostKeyChecking=no ${USER}@${HOST} "/bin/bash ~/grow-root-partII.sh && /bin/rm ~/grow-root-partII.sh && reboot" && echo -e "\n\n PART II .... OK!"
-  if [ $? -eq 0 ];then break;else sleep 10;fi
+  ping ${HOST} -c 2 &>/dev/null
+  if [ $? -eq 0 ];then echo -e "\n Server ["${HOST}"] is alive, exit";break; else echo $t" - Server is not available"; sleep 10; fi
 done
 
-sleep 5
+for t in $(seq 7)
+do
+  echo "Try ssh connect to" ${USER}@${HOST}
+  ssh -o StrictHostKeyChecking=no ${USER}@${HOST} "if [[ -f ~/grow-root-partII.sh ]];then /bin/bash ~/grow-root-partII.sh&&/bin/rm ~/grow-root-partII.sh&&reboot;else echo 'No file ~/grow-root-partII.sh';fi" && echo -e "\n\n PART II .... OK!"
+  if [ $? -eq 0 ];then echo  -e "\n loop exit!"; break; else sleep 10; fi
+done
 
-ping ${HOST} -c 2 &>/dev/null || sleep 10
-ping ${HOST} -c 2 &>/dev/null || sleep 20
-ping ${HOST} -c 2 &>/dev/null || sleep 30
-ping ${HOST} -c 2 &>/dev/null || sleep 40
-ping ${HOST} -c 2 || echo -e '\n\n ERROR!!! The Server has DIED! =('
+for t in $(seq 10)
+do
+  ping ${HOST} -c 2 &>/dev/null
+  if [ $? -eq 0 ];then echo -e "\n Server ["${HOST}"] is alive, exit";break; else echo $t" - Server is not available"; sleep 10; fi 
+done
+
+#ping ${HOST} -c 2 &>/dev/null || sleep 10
+#ping ${HOST} -c 2 &>/dev/null || sleep 20
+#ping ${HOST} -c 2 &>/dev/null || sleep 30
+#ping ${HOST} -c 2 &>/dev/null || sleep 40
+#ping ${HOST} -c 2 || echo -e '\n\n ERROR!!! The Server has DIED! =('
