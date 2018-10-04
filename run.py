@@ -30,6 +30,9 @@ parser.add_argument('--version', '-V', action='version', version='Version: '+ver
 parser.add_argument('--vcenter', dest='vcenter', help='vCenter URL')
 parser.add_argument('--debug', dest='debug',  help='debug mode')
 
+expire_vm_date
+parser.add_argument('--exp' , dest='exp', help='expire date (01/01/18)')
+
 #parser.add_argument('--', dest='',      help='')
 
 args = parser.parse_args()
@@ -66,4 +69,5 @@ else:
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, 
-         ip=args.ip, debug=args.debug)
+         ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
+
