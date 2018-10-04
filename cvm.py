@@ -180,7 +180,7 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
 
 
 
-def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug):
+def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug, expire_vm_date):
 
     ter_dir = template(vm_template)
 
