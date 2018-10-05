@@ -9,9 +9,9 @@ version = '0.0.1'
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--net', '-l',  dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM", required=True)
-parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist ip is not taken from IPAM')
+parser.add_argument('--net', '-l',  dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM")
 parser.add_argument('--vmname', '-n',   dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]", required=True)
+parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--datastor', '-ds', dest='ds',      help="Datastore name")
 parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter [EXMPLE: folder1/folder2]')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
@@ -48,6 +48,10 @@ args = parser.parse_args()
 
 if args.EXPIRE:
     print("Set Expire for vm: "+args.vmname)
+    if expire_vm_date is not None:
+       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
+    else:
+       print("!!! --exp is not to be None")
     quit()
 
 if args.ONLYIP:
@@ -56,25 +60,27 @@ if args.ONLYIP:
 else:
     # check on the fool
     if args.vcenter is None:
-       print("Please enter Vcenter Name [--vcenter]")
+       print("Please enter vCenter Name [--vcenter ...]")
        quit()
     if args.cluster is None: 
-       print("Please enter Vcenter Cluster Name [--cluster]")
+       print("Please enter vCenter Cluster Name [--cluster ...]")
        quit()
     if args.datacenter is None: 
-       print("Please enter Vcenter DataCenter Name [--datacenter]")
+       print("Please enter vCenter DataCenter Name [--datacenter ...]")
        quit()
     if args.ds is None:
-       print("Please enter Vcenter DataStore Name[--datastor]")
+       print("Please enter vCenter DataStore Name [--datastor ...]")
        quit()
-
+    if args.net is None:
+       print("Please enter NETwork [--net ...]")
+    
     if args.mem is not None: 
        args.mem = str(int(args.mem)*1024) # convert GB to MB
     
     if args.cpu   is None: args.cpu = 2
     if args.mem   is None: args.mem = 2048
     if args.dsize is None: args.dsize = 50
-    print('### MEM: '+args.mem+", HDD: "+args.dsize+", CPU: "+args.cpu)
+    print('### [MEM: '+args.mem+"], [HDD: "+args.dsize+"], [CPU: "+args.cpu+"]")
 
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
