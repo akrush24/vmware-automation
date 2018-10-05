@@ -70,11 +70,11 @@ else:
 
     if args.mem is not None: 
        args.mem = str(int(args.mem)*1024) # convert GB to MB
-       print('MEM: '+args.mem)
     
     if args.cpu   is None: args.cpu = 2
     if args.mem   is None: args.mem = 2048
     if args.dsize is None: args.dsize = 50
+    print('### MEM: '+args.mem+", HDD: "+args.dsize+", CPU: "+args.cpu)
 
     main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
