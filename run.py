@@ -13,7 +13,7 @@ parser.add_argument('--net', '-l',  dest='net',     help="Network [EXAMPLE: --ne
 parser.add_argument('--ip', dest='ip', help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--vmname', '-n',   dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]", required=True)
 parser.add_argument('--datastor', '-ds', dest='ds',      help="Datastore name")
-parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter')
+parser.add_argument('--folder', dest='folder',  help='VM Folder in vCenter [EXMPLE: folder1/folder2]')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
 parser.add_argument('--cluster', '-cl', dest='cluster',  help='vSphere Cluster')
 
