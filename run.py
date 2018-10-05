@@ -23,14 +23,15 @@ parser.add_argument('--cpu', '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc', '-d', dest='desc',    help='Description', required=True)
 parser.add_argument('--template', '-tm', dest='template',    help='VM Template')
 
-parser.add_argument('--onlyip',dest='onlyip',  help='Only IP allocation [EXAMPLE: --onlyip yes]', default='No')
 
 parser.add_argument('--version', '-V', action='version', version='Version: '+version)
 
 parser.add_argument('--vcenter', dest='vcenter', help='vCenter URL')
 parser.add_argument('--debug', dest='debug',  help='debug mode')
 
-parser.add_argument('--exp' , dest='exp', help='expire date [EXAMPLE: --exp "01/01/18"]')
+parser.add_argument('--exp' , '--expdate', dest='exp', help='expire date [EXAMPLE: --exp "01/01/18"]')
+parser.add_argument('--ONLYIP','--onlyip', dest='onlyip', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
+parser.add_argument('--EXPIRE' ,           dest='EXPIRE', help='set only expire [EXMPLE --EXPIRE]',      action='store_true')
 
 #parser.add_argument('--', dest='',      help='')
 
@@ -44,21 +45,27 @@ args = parser.parse_args()
 #    print("Please enter VM Template");
 #    quit()
 
-if args.onlyip is not 'No':
+
+if args.EXPIRE:
+    print("Set Expire for vm: "+args.vmname)
+    quit()
+
+if args.ONLYIP:
+    print("Only reserv IP for vm :"+args.vmname)
     ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
 else:
     # check on the fool
     if args.vcenter is None:
-       print("Please enter Vcenter Name")
+       print("Please enter Vcenter Name [--vcenter]")
        quit()
     if args.cluster is None: 
-       print("Please enter Vcenter Cluster Name")
+       print("Please enter Vcenter Cluster Name [--cluster]")
        quit()
     if args.datacenter is None: 
-       print("Please enter Vcenter DataCenter Name")
+       print("Please enter Vcenter DataCenter Name [--datacenter]")
        quit()
     if args.ds is None:
-       print("Please enter Vcenter DataStore Name")
+       print("Please enter Vcenter DataStore Name[--datastor]")
        quit()
 
     if args.cpu   is None: args.cpu = 2
