@@ -111,7 +111,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     #kwargs = {"auto-approve": True}
 
     try:
-       if debug is not None: # is debug mode print all output
+       if debug: # is debug mode print all output
           print(tf.init())
        else:
           tf.init()
@@ -120,7 +120,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
        quit()
 
     try:
-       if debug is not None: # is debug mode print all output
+       if debug: # is debug mode print all output
           print(tf.plan())
        else:
           tf.plan()
@@ -129,7 +129,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
        quit()
 
     try:
-       if debug is not None: # is debug mode print all output
+       if debug: # is debug mode print all output
           print(tf.apply())
        else:
           tf.apply()
