@@ -48,8 +48,8 @@ args = parser.parse_args()
 
 if args.EXPIRE:
     print("Set Expire for vm: "+args.vmname)
-    if expire_vm_date is not None:
-       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
+    if args.exp is not None:
+       scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
     else:
        print("!!! --exp is not to be None")
     quit()
