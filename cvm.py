@@ -14,6 +14,8 @@ from tools import cli
 
 from datetime import datetime
 
+from subprocess import call
+
 # get ip address
 def ipam_create_ip(hostname, infraname, cidr):
     try:
@@ -49,7 +51,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
-    template_linux = ['template_centos7.3','template_ubuntu16.04','centos7.0-clear-v2-template','template_centos6.8_x86_64','centos-7-es-5.1.1-template','template_debian9','template_centos7.5_x86_64', 'centos-7-docker-git-v2-template', 'template_rhel7.4','template_oel_7.4']
+    template_linux = ['template_centos7.3','template_centos7.2','template_ubuntu16.04','centos7.0-clear-v2-template','template_centos6.8_x86_64','centos-7-es-5.1.1-template','template_debian9','template_centos7.5_x86_64', 'centos-7-docker-git-v2-template', 'template_rhel7.4','template_oel_7.4']
     template_wind = ['template_wind2012','template_wind2008','template_WinSrv2012R2RU', 'template_winsrv2012r2ru', 'template_WinSrv2012R2', 'temp_w7_x64', 'WinSer2012R2_EN']
     if vm_template in template_linux:
         ter_dir = './linux'
@@ -200,6 +202,10 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     try:
        create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
        print ("### VM is Ready: ["+hostname+" : "+ip+"]")
+       if ter_dir == './linux':
+          answ = input("Run disk resize? (Y/N)")
+          #if answ == 'Y':
+          call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
     except:
        print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
        quit()
@@ -216,8 +222,8 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     except:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
 
-    if expire_vm_date is not None:
-       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
+#    if expire_vm_date is not None:
+#       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
 
 # main (hostname='host889', infraname='INFRA8888', cidr='192.168.222.0/24', vc_host='vc-linx.srv.local',
 #       vc_user='', vc_pass='', vc_dc='Datacenter-Linx', vc_cluster='linx-cluster01',

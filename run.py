@@ -82,8 +82,21 @@ else:
     if args.dsize is None: args.dsize = 50
     print('### [MEM: '+args.mem+"], [HDD: "+args.dsize+"], [CPU: "+args.cpu+"]")
 
-    main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
+    try:
+       main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, 
          ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
+    except:
+       print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
+       quit()
+
+    if expire_vm_date is not None:
+       try:
+          print ("### Create sheduled power off vm on" + expire_vm_date)
+          scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
+       except:
+          print ("!!! ERROR: scheduledTask_poweroff: ", sys.exc_info())
+
+
 
