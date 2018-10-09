@@ -123,18 +123,19 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
 
     try:
        if debug: # is debug mode print all output
-          print(tf.plan())
+          print(tf.plan(no_color=IsFlagged, refresh=False, capture_output=True))
        else:
-          tf.plan()
+          tf.plan(no_color=IsFlagged, refresh=False, capture_output=True)
     except:
        print ("!!! ERROR in create_vm_terraform(tf.plan()): ",sys.exc_info())
        quit()
 
+    approve = {"auto-approve": True}
     try:
        if debug: # is debug mode print all output
-          print(tf.apply())
+          print(tf.apply(**approve))
        else:
-          tf.apply()
+          tf.apply(**approve)
     except:
        print ("!!! ERROR in create_vm_terraform(tf.apply()): ",sys.exc_info())
        quit()
@@ -202,10 +203,6 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     try:
        create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
        print ("### VM is Ready: ["+hostname+" : "+ip+"]")
-       if ter_dir == './linux':
-          answ = input("Run disk resize? (Y/N)")
-          #if answ == 'Y':
-          call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
     except:
        print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
        quit()
@@ -221,6 +218,8 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
        print ("### Move VM to: ["+folder_vm+"]")
     except:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
+
+    return ip
 
 #    if expire_vm_date is not None:
 #       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
@@ -241,6 +240,7 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
     if not vms:
         print('VM not found')
         connect.Disconnect(si)
+        quit()
         return -1
     vm = vms[0]
     spec = vim.scheduler.ScheduledTaskSpec()

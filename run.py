@@ -29,9 +29,10 @@ parser.add_argument('--version', '-V', action='version', version='Version: '+ver
 parser.add_argument('--vcenter', dest='vcenter', help='vCenter URL')
 parser.add_argument('--debug', dest='debug',  help='debug mode', action='store_true')
 
-parser.add_argument('--exp' , '--expdate', dest='exp', help='expire date [EXAMPLE: --exp "01/01/18"]')
-parser.add_argument('--ONLYIP','--onlyip', dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
-parser.add_argument('--EXPIRE' ,           dest='EXPIRE', help='set only expire [EXMPLE --EXPIRE]',      action='store_true')
+parser.add_argument('--exp' , '--expdate',  dest='exp',    help='Expiry date [EXAMPLE: --exp "01/01/18"]')
+parser.add_argument('--ONLYIP','--onlyip',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
+parser.add_argument('--EXPIRE' ,'--expire', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
+parser.add_argument('--resize' ,            dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
 
 #parser.add_argument('--', dest='',      help='')
 
@@ -83,7 +84,7 @@ else:
     print('### [MEM: '+args.mem+"], [HDD: "+args.dsize+"], [CPU: "+args.cpu+"]")
 
     try:
-       main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
+       ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,
          vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.mem,
          vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, 
          ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
@@ -91,12 +92,18 @@ else:
        print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
        quit()
 
-    if expire_vm_date is not None:
+    if args.exp is not None:
        try:
-          print ("### Create sheduled power off vm on" + expire_vm_date)
-          scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
+          print ("### Create sheduled power off "+args.vmname+" in " + args.exp)
+          scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
        except:
           print ("!!! ERROR: scheduledTask_poweroff: ", sys.exc_info())
+          quit()
 
+
+    if args.RESIZE: # resize HDD
+       #answ = input('Run disk resize on '+ ip +' [Y/N]?')
+       #if answ == 'Y':
+       call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
 
 
