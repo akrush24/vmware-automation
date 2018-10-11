@@ -20,7 +20,7 @@ parser.add_argument('--cluster', '-cl', dest='cluster',  help='vSphere Cluster')
 parser.add_argument('--dsize', '--hdd', '-hdd', dest='dsize',   help='Disk Size')
 parser.add_argument('--msize', '--mem', '--ram', '-m', dest='mem',   help='RAM Size in GB')
 parser.add_argument('--cpu', '-c', dest='cpu',     help='CPU Count')
-parser.add_argument('--desc', '-d', dest='desc',    help='Description', required=True)
+parser.add_argument('--desc', '-d', dest='desc',    help='Description')
 parser.add_argument('--template', '-tm', dest='template',    help='VM Template')
 
 
@@ -74,6 +74,8 @@ else:
        quit()
     if args.net is None:
        print("Please enter NETwork [--net ...]")
+    if args.desc is None:
+       print("Please enter Description [--desc ...]")
     
     if args.mem is not None: 
        args.mem = str(int(args.mem)*1024) # convert GB to MB
