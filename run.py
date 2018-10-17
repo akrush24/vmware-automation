@@ -57,6 +57,8 @@ if args.EXPIRE:
 
 if args.ONLYIP:
     print("Only reserv IP for vm :"+args.vmname)
+    if args.desc is None:
+       args.desc = args.vmname
     ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
 else:
     # check on the fool
