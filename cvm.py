@@ -238,7 +238,7 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
        (d, m, y) = (datefind[0], datefind[1], datefind[len(datefind)-1])
        #dt = datetime.strptime(expire_vm_date+" 10:30", "%d/%m/%y %H:%M")
        dt = datetime.strptime(d + "/" + m + "/" + y +" 10:30", "%d/%m/%y %H:%M")
-       print("Expired date is" + str(dt))
+       print("### Expired date is" + str(dt))
     except:
        print("!!! Invalid date specified"+expire_vm_date+"->"+str(dt))
        quit()
@@ -246,7 +246,7 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
     view = si.content.viewManager.CreateContainerView(si.content.rootFolder, [vim.VirtualMachine],True)
     vms = [vm for vm in view.view if vm.name == hostname]
     if not vms:
-       print('VM not found')
+       print('!!! VM not found')
        connect.Disconnect(si)
        quit()
        return -1
