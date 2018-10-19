@@ -151,11 +151,13 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
 
 #change folder, write notes
 
-def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname):
+def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
     uuid = config_uuid.summary.config.instanceUuid
-    message = ip + " " + infraname
+    message = "AutoDeploy, IP:" + ip + ", " + infraname
+    if expired is not None:
+       message = message + ", exp: " + expired
     vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
     print("Found: {0}".format(vm.name))
     spec = vim.vm.ConfigSpec()
@@ -181,8 +183,6 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
     folder.MoveIntoFolder_Task([config_uuid])
 
 
-
-
 def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug, expire_vm_date):
 
     ter_dir = template(vm_template)
@@ -199,7 +199,6 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     else:
        print ("### YOUR IP is: ["+ip+"]")
 
-
     try:
        create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
        print ("### VM is Ready: ["+hostname+" : "+ip+"]")
@@ -207,17 +206,17 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
        print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
        quit()
 
-    try:
-       notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
-       print ("### Edit nodes to: ["+infraname+"]")
-    except:
-       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
+#    try:
+#       notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
+#       print ("### Edit nodes to: ["+infraname+"]")
+#    except:
+#       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
 
-    try:
-       move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
-       print ("### Move VM to: ["+folder_vm+"]")
-    except:
-       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
+#    try:
+#       move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
+#       print ("### Move VM to: ["+folder_vm+"]")
+#    except:
+#       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
 
     return ip
 
@@ -234,14 +233,23 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
 #hostname this is name vm vcenter
 def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
     si = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
-    dt = datetime.strptime(expire_vm_date+" 10:30", "%d/%m/%y %H:%M")
+    try:
+       datefind = re.findall('(\w\w)',expire_vm_date)
+       (d, m, y) = (datefind[0], datefind[1], datefind[len(datefind)-1])
+       #dt = datetime.strptime(expire_vm_date+" 10:30", "%d/%m/%y %H:%M")
+       dt = datetime.strptime(d + "/" + m + "/" + y +" 10:30", "%d/%m/%y %H:%M")
+       print("Expired date is" + str(dt))
+    except:
+       print("!!! Invalid date specified"+expire_vm_date+"->"+str(dt))
+       quit()
+
     view = si.content.viewManager.CreateContainerView(si.content.rootFolder, [vim.VirtualMachine],True)
     vms = [vm for vm in view.view if vm.name == hostname]
     if not vms:
-        print('VM not found')
-        connect.Disconnect(si)
-        quit()
-        return -1
+       print('VM not found')
+       connect.Disconnect(si)
+       quit()
+       return -1
     vm = vms[0]
     spec = vim.scheduler.ScheduledTaskSpec()
     spec.name = 'PowerOff vm %s' % hostname
@@ -252,5 +260,4 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
     spec.action.name = vim.VirtualMachine.PowerOff
     spec.enabled = True
     si.content.scheduledTaskManager.CreateScheduledTask(vm, spec)
-
 
