@@ -30,7 +30,7 @@ parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL')
 parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store_true')
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "01/01/18"]')
-parser.add_argument('--ONLYIP',  '--onlyip',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
+parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
 parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
 parser.add_argument('--resize' , '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
 
