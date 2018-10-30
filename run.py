@@ -102,8 +102,8 @@ else:
     except:
        print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
        quit()
-
-    print ("### Edit nodes to: ["+args.desc+" "+args.exp+"]")
+    
+    print ("### Edit nodes to: ["+str(args.desc)+" "+str(args.exp)+"]")
     try:
        print (notes_write_vm(args.vcenter, vc_user, vc_pass, ip, args.desc, args.exp))
     except:
@@ -126,7 +126,7 @@ else:
           print ("!!! ERROR: scheduledTask_poweroff: ", sys.exc_info())
           quit()
     else:
-       print("You did not enter the VM lifetime. PASS.")
+       print("!!! You did not enter the VM lifetime. PASS.")
 
 
     if args.RESIZE: # resize HDD
