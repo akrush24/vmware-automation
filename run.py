@@ -112,7 +112,7 @@ else:
 
     print ("### Move VM to: ["+args.folder+"]")
     try:
-       move_vm_to_folder(args.vcenter, vc_user, vc_pass, ip, args.folder)
+       move_vm_to_folder(args.vcenter, vc_user, vc_pass, ip, args.folder, args.cluster)
     except:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
        quit()

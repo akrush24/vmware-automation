@@ -171,14 +171,17 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
     task = vm.ReconfigVM_Task(spec)
 
 
-def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
+def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm, cluster):
     folder_dc_pass = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
                        'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
-                      #'vc-khut.srv.local': 'Datacenter-KHUT/vm/',
-                      #'khut-vc01.srv.local': 'Khutorskaya/vm/',
                        'vcenter.at-consulting.ru': 'SAV/vm/' }
 
-    folder_dc_pass['vc-khut.srv.local'] = 'ATK/vm/'
+    # for multi datacenter VCSA
+    if cluster == "Khut-CL1" or cluster == "cluster-infra":
+       folder_dc_pass['vc-khut.srv.local'] = 'ATK/vm/'
+    else:
+       folder_dc_pass['vc-khut.srv.local'] = 'Datacenter-KHUT/vm/'
+
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
