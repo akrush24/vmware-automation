@@ -36,6 +36,9 @@ def ipam_create_ip(hostname, infraname, cidr):
        ####
 
        print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
+       if infraname is None:
+          print ("!!! Description is None, exit")
+          quit()
 
        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
@@ -51,7 +54,7 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
-    template_linux = ['template_centos7.3','template_centos7.2','template_ubuntu16.04','centos7.0-clear-v2-template','template_centos6.8_x86_64','centos-7-es-5.1.1-template','template_debian9','template_centos7.5_x86_64', 'centos-7-docker-git-v2-template', 'template_rhel7.4','template_oel_7.4']
+    template_linux = ['template_centos7.3','template_centos7.2','template_ubuntu16.04','centos7.0-clear-v2-template','template_centos6.8_x86_64','centos-7-es-5.1.1-template','template_debian9','template_centos7.5_x86_64', 'centos-7-docker-git-v2-template', 'template_rhel7.4','template_oel_7.4', 'template_ubuntu_1604']
     template_wind = ['template_wind2012','template_wind2008','template_WinSrv2012R2RU', 'template_winsrv2012r2ru', 'template_WinSrv2012R2', 'temp_w7_x64', 'WinSer2012R2_EN']
     if vm_template in template_linux:
         ter_dir = './linux'
@@ -90,6 +93,8 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.189.0/24': '192.168.189_uni',
                     '192.168.231.0/24': '231_VMNetwork',
                     '192.168.14.0/23' : 'VLAN14',
+                    '172.20.20.0/24'  : '172.20.20.0',
+                    '172.25.16.0/24'  : '172.25.16.0',
                     '192.168.24.0/24' : 'VLAN24-192.168.24.0', # ATC vcenter.at-consulting.ru
                     '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0', # ATC vcenter.at-consulting.ru
                     '192.168.194.0/24': 'ds-VLAN_194' # ATC vcenter.at-consulting.ru
@@ -97,6 +102,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
 
         if port_int[cidr]:
             vm_portgroup = port_int.get(cidr)
+            print ("### PortGroup is "+vm_portgroup)
             return vm_portgroup
         else:
             print ('!!! No network portgroup!')
@@ -166,11 +172,14 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
 
 
 def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
-    folder_dc = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
-                  'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
-                  'vc-khut.srv.local': 'Datacenter-KHUT/vm/',
-                  'khut-vc01.srv.local': 'Khutorskaya/vm/',
-                  'vcenter.at-consulting.ru': 'SAV/vm/'}.get(vc_host)
+    folder_dc_pass = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
+                       'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
+                      #'vc-khut.srv.local': 'Datacenter-KHUT/vm/',
+                      #'khut-vc01.srv.local': 'Khutorskaya/vm/',
+                       'vcenter.at-consulting.ru': 'SAV/vm/' }
+
+    folder_dc_pass['vc-khut.srv.local'] = 'ATK/vm/'
+    folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
     config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
     uuid = config_uuid.summary.config.instanceUuid
@@ -179,7 +188,7 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm):
     task = vm.ReconfigVM_Task(spec)
     tasks.wait_for_tasks(service_instance, [task])
     folder = service_instance.content.searchIndex.FindByInventoryPath(folder_dc+folder_vm)
-    print(folder)
+    print(folder_vm)
     folder.MoveIntoFolder_Task([config_uuid])
 
 
