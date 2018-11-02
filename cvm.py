@@ -172,15 +172,16 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
 
 
 def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm, cluster):
-    folder_dc_pass = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/',
-                       'vcsa.srv.local'  : 'Datacenter-AKB/vm/',
-                       'vcenter.at-consulting.ru': 'SAV/vm/' }
+    folder_dc_pass = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/','vcenter.at-consulting.ru': 'SAV/vm/' }
 
     # for multi datacenter VCSA
     if cluster == "Khut-CL1" or cluster == "cluster-infra":
        folder_dc_pass['vc-khut.srv.local'] = 'ATK/vm/'
     else:
        folder_dc_pass['vc-khut.srv.local'] = 'Datacenter-KHUT/vm/'
+
+    if cluster == "AKB-Cluster":
+       folder_dc_pass['vcsa.srv.local'] = 'PHX/vm/'
 
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
