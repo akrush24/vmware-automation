@@ -182,6 +182,8 @@ def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm, cluster):
 
     if cluster == "AKB-Cluster":
        folder_dc_pass['vcsa.srv.local'] = 'PHX/vm/'
+    if cluster == "k8s-kluster":
+       folder_dc_pass['vcsa.srv.local'] = 'PHX/vm/'
 
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
