@@ -7,13 +7,14 @@ import argparse
 import getpass
 import json
 import pandas as pd
+import sys
 import time
-from progress.bar import Bar
-import progressbar
-from operator import itemgetter
+import tqdm
+
 ########VARIBLE#########
 config_vcenter = 'vcenter.json'
 config_network = 'network.json'
+config_template = ''
 
 storage_type = "LocalStore"
 
@@ -126,7 +127,7 @@ def change_port_group(vm):
             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             nicspec.device = device
             nicspec.device.wakeOnLanEnabled = True
-            #network =  vm_portgroup
+            network =  vm_portgroup
             dvs_port_connection = vim.dvs.PortConnection()
             dvs_port_connection.portgroupKey = network.key
             dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
@@ -143,38 +144,6 @@ def change_port_group(vm):
 
 
 
-    # def change_port_group(vm):
-    #
-    #     vm_portgroup = PortGroup(vm_net_address)
-    #     device_change = []
-    #     for device in vm.config.hardware.device:
-    #         if isinstance(device, vim.vm.device.VirtualEthernetCard):
-    #             nicspec = vim.vm.device.VirtualDeviceSpec()
-    #             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
-    #             nicspec.device = device
-    #             nicspec.device.wakeOnLanEnabled = True
-    #             network =  vm_portgroup
-    #             dvs_port_connection = vim.dvs.PortConnection()
-    #             dvs_port_connection.portgroupKey = network.key
-    #             dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
-    #             nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-    #             nicspec.device.backing.port = dvs_port_connection
-    #             nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
-    #             nicspec.device.connectable.startConnected = True
-    #             nicspec.device.connectable.allowGuestControl = True
-    #             device_change.append(nicspec)
-    #             break
-    #         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-    #         task = vm.ReconfigVM_Task(config_spec)
-    #         wait_for_task(task)
-
-
-
-
-
-
-            #  Cluster, storage_type, vm_ram, vm_disk_size
-####Optimal_Esxi_Host(Cluster(cluster_name), storage_type, vm_ram, vm_disk_size))
 def Choice_Esxi(Cluster, storage_type, vm_ram, vm_disk_size):
     host_list = []
     for host in Cluster.host:
@@ -187,24 +156,17 @@ def Choice_Esxi(Cluster, storage_type, vm_ram, vm_disk_size):
                     used_storage = int(store_name.summary.capacity - store_name.summary.freeSpace - vm_disk_size)
                     free_store_perc = 100 - (used_storage / store_name.summary.capacity * 100)
                     if free_store_perc > 15:
-                        host_list.append ({'host': str(host.name), 'ram': int(free_mem_perc), 'disk': int(free_store_perc)})
+                        host_list.append ({'host': str(host.name), 'ram': int(free_mem_perc),
+                                           'disk': int(free_store_perc)})
     esxi_host = pd.DataFrame(host_list).sort_values(by=['ram'], ascending=False).reset_index()
     esxi_host = esxi_host['host'].iloc[0]
     return esxi_host
-    #print(host_list, key=itemgetter('ram'))
-
-
-#choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
-#print(choice_esxi)
-
 
 
 def Choice_host(Cluster, Choice_Esxi):
     for host in Cluster.host:
         if host.name == Choice_Esxi:
             return host
-
-
 
 
 def Choice_Store(Cluster, Choice_Esxi):
@@ -215,8 +177,6 @@ def Choice_Store(Cluster, Choice_Esxi):
                     return storage_name
                 else:
                     print('No type datastore')
-
-
 
 
 
@@ -236,15 +196,78 @@ def Clone_vm_localstore():
     clonespec = vim.vm.CloneSpec()
     clonespec.location = relospec
     #clonespec.powerOn = power_on
-    print ("cloning VM...")
+    print ("Cloning VM: " + template.name + ' to ' + vm_name )
+    print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
     task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
-    wait_for_task(task)
-    if task.info.result == None:
-        print('Cloning VM Error ')
-    else:
-        vm_obj = task.info.result
+    with tqdm.tqdm(total=95) as pbar:
+        while task.info.progress != None:
+            cur_perc = int(task.info.progress)
+            pbar.update(cur_perc - pbar.n)
+            if cur_perc == 95:
+                break
 
-    change_port_group(vm_obj)
+
+    print(task)
+
+
+    #wait_for_task(task)
+#
+Clone_vm_localstore()
+
+
+
+                # if task.info.result == None:
+    #     print('Cloning VM Error ')
+    # else:
+    #     vm_obj = task.info.result
+
+    #change_port_group(vm_obj)
+    # def updt(total, progress):
+    #
+    #     barLength, status = 20, ""
+    #     progress = float(progress) / float(total)
+    #     if progress >= 1.:
+    #         progress, status = 1, "\r\n"
+    #     block = int(round(barLength * progress))
+    #     text = "\r[{}] {:.0f}% {}".format(
+    #         "#" * block + "-" * (barLength - block), round(progress * 100, 0),
+    #         status)
+    #     sys.stdout.write(text)
+    #     sys.stdout.flush()
+    #
+    # time.sleep(2)
+    # with int(task.info.progress) != None:
+    #     time.sleep(1)
+    #     runs = int(task.info.progress)
+    #     for run_num in range(runs):
+    #         time.sleep(.1)
+    #         updt(runs, run_num + 1)
+    # time.sleep(3)
+    # # with task.info.state == 'success':
+    #
+    # time.sleep(4)
+    # with tqdm.tqdm(total=95) as pbar:
+    #     while task.info.progress != None:
+    #         cur_perc = int(task.info.progress)
+    #         pbar.update(cur_perc - pbar.n)  # here we update the bar of increase of cur_perc
+    #         if cur_perc == 95:
+    #             break
+    #
+    #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -252,7 +275,6 @@ def Clone_vm_localstore():
 
 #print(PortGroup(vm_net_address))
 
-Clone_vm_localstore()
 
 #print(PortGroup(vm_net_address).name)
 
