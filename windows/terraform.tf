@@ -82,7 +82,7 @@ resource "vsphere_virtual_machine" "vm" {
       windows_options {
         computer_name  = "${var.vm_hostname}"
         workgroup    = "WORKGROUP"
-        admin_password = "qwerty$4"
+        admin_password = "q1!@W@"
         product_key = "${var.vm_product_key}"
         time_zone = "145"
       }
