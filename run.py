@@ -32,6 +32,7 @@ parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "01/01/18"]')
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
 parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
+parser.add_argument('-N', dest='NODES', help='Edit Nodes only',      action='store_true')
 parser.add_argument('--resize' , '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
 
 #parser.add_argument('--', dest='',      help='')
@@ -54,6 +55,24 @@ if args.EXPIRE:
     else:
        print("!!! --exp is not to be None")
     quit()
+
+if args.NODES:
+   print("Only Edit Nodes for vm: "+args.vmname+" Ok....")
+   if args.desc is None:
+      print("!!! Please enter Dscriptin")
+      quit()
+   if args.ip is None:
+      print("!!! Please enter IP")
+      quit()
+   else:
+      ip=args.ip
+   try:
+      print (notes_write_vm(args.vcenter, vc_user, vc_pass, ip, args.desc, args.exp))
+      quit()
+   except:
+      print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
+      quit()
+
 
 if args.ONLYIP:
     print("Only reserv IP for vm :"+args.vmname)
@@ -89,7 +108,7 @@ else:
 
     if args.desc is None:
        print("Please enter Description [--desc ...]")
-    
+
     if args.mem is not None: args.mem = str(int(args.mem)*1024) # convert GB to MB
     if args.cpu   is None: args.cpu = 2
     if args.mem   is None: args.mem = 2048
@@ -102,7 +121,7 @@ else:
     except:
        print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
        quit()
-    
+
     print ("### Edit nodes to: ["+str(args.desc)+" "+str(args.exp)+"]")
     try:
        print (notes_write_vm(args.vcenter, vc_user, vc_pass, ip, args.desc, args.exp))
