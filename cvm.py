@@ -57,7 +57,7 @@ def template(vm_template):
     template_linux = ['template_centos7.3',
     'template_centos7.2',
     'template_centos7.5',
-    'template_ubuntu16.04',
+    'template_ubuntu_16.04',
     'centos7.0-clear-v2-template',
     'template_centos6.8_x86_64',
     'centos-7-es-5.1.1-template',
