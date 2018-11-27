@@ -5,18 +5,19 @@ from pyVim import connect
 import atexit
 import argparse
 import getpass
+import re
 import json
 import pandas as pd
 import sys
 import time
 import tqdm
-
+import requests
 ########VARIBLE#########
 config_vcenter = 'vcenter.json'
 config_network = 'network.json'
 config_template = ''
 
-storage_type = "LocalStore"
+storage_type = "LocalStore" # san , nas
 
 vcenter_host = 'vc-linx.srv.local'
 datacenter_name = 'Datacenter-Linx'
@@ -40,9 +41,11 @@ def Json_Parser(config_file):
     return config
 
 
-si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
+def content ():
+    si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
                                pwd=Json_Parser(config_vcenter)[vcenter_host][1], port=443)
-content = si.RetrieveContent()
+    content = si.RetrieveContent()
+    return content
 
 def get_obj(content, vimtype, name):
     obj = None
@@ -70,7 +73,7 @@ def wait_for_task(task):
             task_done = True
 
 
-def Datacenter (datacenter_name):
+def Datacenter (datacenter_name, content):
     datacenter = get_obj(content, [vim.Datacenter], datacenter_name)
     if  datacenter.name == datacenter_name:
         return datacenter
@@ -81,7 +84,7 @@ def Datacenter (datacenter_name):
 
 
 
-def Cluster():
+def Cluster(content):
     cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
     if cluster == None:
         print('Not found ClusterName: '+ cluster_name)
@@ -90,7 +93,7 @@ def Cluster():
 
 
 
-def Template(template_name):
+def Template(content, template_name):
     template_name = get_obj(content, [vim.VirtualMachine], template_name)
     if template_name == None:
         print('Not found template name: ' + template_name)
@@ -98,7 +101,7 @@ def Template(template_name):
         return template_name
 
 
-def Folder_Dest (Datacenter, folder_name_vm):
+def Folder_Dest (content, Datacenter, folder_name_vm):
     destfolder = get_obj(content, [vim.Folder], folder_name_vm)
     if destfolder == None:
         Datacenter.vmFolder.CreateFolder(folder_name_vm)
@@ -108,7 +111,7 @@ def Folder_Dest (Datacenter, folder_name_vm):
         return destfolder
 
 
-def PortGroup(vm_net_address):
+def PortGroup(content, vm_net_address):
     try:
         portgroup_conf_pars = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][0]
         portgroup = get_obj(content, [vim.Network], portgroup_conf_pars)
@@ -137,10 +140,9 @@ def change_port_group(vm):
             nicspec.device.connectable.startConnected = True
             nicspec.device.connectable.allowGuestControl = True
             device_change.append(nicspec)
-            break
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-        task = vm.ReconfigVM_Task(config_spec)
-        wait_for_task(task)
+    task = vm.ReconfigVM_Task(config_spec)
+    wait_for_task(task)
 
 
 
@@ -199,21 +201,216 @@ def Clone_vm_localstore():
     print ("Cloning VM: " + template.name + ' to ' + vm_name )
     print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
     task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
-    with tqdm.tqdm(total=95) as pbar:
+    with tqdm.tqdm(total=100) as pbar:
         while task.info.progress != None:
             cur_perc = int(task.info.progress)
             pbar.update(cur_perc - pbar.n)
             if cur_perc == 95:
                 break
 
+def Cpu_Mem_Reconfig(vm, core_cpu, sock_cpu, ram_mb):
+    cspec = vim.vm.ConfigSpec()
+    cspec.cpuHotAddEnabled = True
+    cspec.memoryHotAddEnabled = True
+    cspec.numCPUs = 4
+    cspec.numCoresPerSocket = 1
+    cspec.memoryMB = 1024
+    vm.Reconfigure(cspec)
 
-    print(task)
+
+
+
+
+
+def disk_vm_resize(vm, vm_disk_size):
+
+    for dev in vm.config.hardware.device:
+        if hasattr(dev.backing, 'fileName'):
+            if  'Hard disk 1'  ==  dev.deviceInfo.label:
+                capacity_in_kb = dev.capacityInKB
+                new_disk_kb = int(vm_disk_size) * 1024 * 1024
+                if new_disk_kb > capacity_in_kb:
+                    dev_changes = []
+                    disk_spec = vim.vm.device.VirtualDeviceSpec()
+                    disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+                    disk_spec.device = vim.vm.device.VirtualDisk()
+                    disk_spec.device.key = dev.key
+                    disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+                    disk_spec.device.backing.fileName = dev.backing.fileName
+                    disk_spec.device.backing.diskMode = dev.backing.diskMode
+                    disk_spec.device.controllerKey = dev.controllerKey
+                    disk_spec.device.unitNumber = dev.unitNumber
+                    disk_spec.device.capacityInKB = new_disk_kb
+                    dev_changes.append(disk_spec)
+                else:
+                    print('Disk size not corect')
+            else:
+                print('No disk Hard_disk 1')
+    if dev_changes != []:
+        spec = vim.vm.ConfigSpec()
+        spec.deviceChange = dev_changes
+        task = vm.ReconfigVM_Task(spec=spec)
+    else:
+         print('Task resize disk Error')
+
+
+
+
+def Annotation_VM(vm, descriptinon ):
+    spec = vim.vm.ConfigSpec()
+    spec.annotation = descriptinon
+    task = vm.ReconfigVM_Task(spec)
+    wait_for_task(task)
+
+#vm, ip, netmask, gw, dns_prefix, dns_list
+
+def Customiz_Os(vm, ip, netmask, gw, dns_prefix, dns_list):
+    netmask_vm = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][2]
+    gateway_vm = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][1]
+    dns_prefix = Json_Parser(config_network)[Datacenter(datacenter_name).name]["dnsprefix"][0]
+    dns_servers = Json_Parser(config_network)[Datacenter(datacenter_name).name]["dnslist"][0]
+
+
+
+
+    def Nix_Customiz():
+        adaptermap = vim.vm.customization.AdapterMapping()
+        # globalip = vim.vm.customization.GlobalIPSettings()
+        adaptermap.adapter = vim.vm.customization.IPSettings()
+        adaptermap.adapter.ip = vim.vm.customization.FixedIp()
+        adaptermap.adapter.ip.ipAddress = ip
+        adaptermap.adapter.subnetMask = netmask_vm
+        adaptermap.adapter.gateway = gateway_vm
+        adaptermap.adapter.dnsDomain = dns_prefix
+        globalip = vim.vm.customization.GlobalIPSettings()
+        globalip.IPSetings.dnsServerList = dns_servers
+        ident = vim.vm.customization.LinuxPrep(domain='srv.local',
+                                               hostName=vim.vm.customization.FixedName(name=vm_name))
+        customspec = vim.vm.customization.Specification()
+        customspec.identity = ident
+        customspec.nicSettingMap = [adaptermap]
+        customspec.globalIPSettings = globalip
+        task = vm.Customize(spec=customspec)
+
+    def Win_Customiz():
+
+        # https://github.com/vmware/pyvmomi/issues/261
+
+        adaptermap = vim.vm.customization.AdapterMapping()
+        globalip = vim.vm.customization.GlobalIPSettings()
+        adaptermap.adapter = vim.vm.customization.IPSettings()
+        adaptermap.adapter.ip = vim.vm.customization.FixedIp()
+        adaptermap.adapter.ip.ipAddress = ip
+        adaptermap.adapter.subnetMask = netmask_vm
+        adaptermap.adapter.gateway = gateway_vm
+        adaptermap.adapter.dnsDomain = dns_prefix
+        adaptermap.adapter.dnsServerList = dns_servers
+        globalip = vim.vm.customization.GlobalIPSettings()
+            # globalip.dnsServerList = ['172.20.20.20', '192.168.245.20']
+        ident = vim.vm.customization.Sysprep()
+        ident.guiUnattended = vim.vm.customization.GuiUnattended()
+            # ident.guiUnattended.autoLogon = False
+        ident.guiUnattended.password = vim.vm.customization.Password()
+        ident.guiUnattended.password.plainText = True
+        ident.guiUnattended.password.value = 'qwerty$4'
+        ident.userData = vim.vm.customization.UserData()
+        ident.userData.fullName = vm_name
+        ident.userData.orgName = "Rtech"
+        ident.userData.computerName = vim.vm.customization.FixedName()
+        ident.userData.computerName.name = vm_name
+        ident.identification = vim.vm.customization.Identification()
+        customspec = vim.vm.customization.Specification()
+        customspec.identity = ident
+        customspec.nicSettingMap = [adaptermap]
+        customspec.globalIPSettings = globalip
+        task = vm.Customize(spec=customspec)
+
+    guest_id_win = ['windows7Server64Guest', 'windows8Server64Guest']
+    guest_id_nix = ['centos64Guest', 'centos7_64Guest', 'ubuntu64Guest']
+
+    vm_guest_id = vm.guest.guestId
+    if vm_guest_id in guest_id_win:
+        Win_Customiz()
+    elif vm_guest_id in guest_id_nix:
+        Nix_Customiz()
+    else:
+        print("No support OS")
+
+
+def scheduledTask_poweroff(vm, expire_vm_date, vc_host):
+    try:
+       datefind = re.findall('(\w\w)',expire_vm_date)
+       (d, m, y) = (datefind[0], datefind[1], datefind[len(datefind)-1])
+       #dt = datetime.strptime(expire_vm_date+" 10:30", "%d/%m/%y %H:%M")
+       dt = datetime.strptime(d + "/" + m + "/" + y +" 10:30", "%d/%m/%y %H:%M")
+       print("### Expired date is: " + str(dt))
+    except:
+       print("!!! Invalid date specified"+expire_vm_date+"->"+str(dt))
+       quit()
+
+    view = si.content.viewManager.CreateContainerView(si.content.rootFolder, [vim.VirtualMachine],True)
+    vms = [vm for vm in view.view if vm.name == hostname]
+    if not vms:
+       print('!!! VM not found')
+       connect.Disconnect(si)
+       quit()
+       return -1
+    vm = vms[0]
+    spec = vim.scheduler.ScheduledTaskSpec()
+    spec.name = 'PowerOff vm %s' % vm.name
+    spec.description = 'expire date order vm'
+    spec.scheduler = vim.scheduler.OnceTaskScheduler()
+    spec.scheduler.runAt = dt
+    spec.action = vim.action.MethodAction()
+    spec.action.name = vim.VirtualMachine.PowerOff
+    spec.enabled = True
+    si.content.scheduledTaskManager.CreateScheduledTask(vm, spec)
+
+
+
+
+
+def ipam_get_ip(hostname, infraname, cidr):
+    try:
+       token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/',
+                             auth=(user_api, pass_api)).json()['data']['token']
+       headers = {'token':token}
+       cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
+       get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+
+       print("### SUBnet ID for [" + cidr + "] is: [" + get_subnet_id + "]")
+       if infraname is None:
+           print("!!! Description is None, exit")
+           quit()
+
+       get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
+       ip = requests.get(url=get_ip_url, headers=headers).json()['data']
+       create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
+       create = requests.post(url = create_url , headers=headers).json()['success']
+
+       if create == True:
+          print ("### NEW IP for ["+hostname+"] is: ["+ip+"]")
+          return ip  # get ip address
+
+    except:
+       print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
+       quit()
+
+
+
+
+
+
+
+
+    #print(task)
 
 
     #wait_for_task(task)
 #
-Clone_vm_localstore()
+#Clone_vm_localstore()
 
+Customiz_Os()
 
 
                 # if task.info.result == None:

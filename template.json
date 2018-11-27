@@ -10,6 +10,23 @@
       "template_winsrv2012r2ru",
       "template_WinSrv2012R2EN"
     ]
+  },
+
+  "РНХ": {
+    "linux_template": [
+        "template_centos7.5",
+        "template_centos7.3",
+        "template_oel_7.4"
+    ],
+    "windows_template": [
+      "windows2008r2_template",
+      "template_winsrv2012r2ru",
+      "template_WinSrv2012R2EN"
+    ]
   }
+
+
 }
+
+
 
