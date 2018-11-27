@@ -41,11 +41,10 @@ def Json_Parser(config_file):
     return config
 
 
-def content ():
-    si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
+si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
                                pwd=Json_Parser(config_vcenter)[vcenter_host][1], port=443)
-    content = si.RetrieveContent()
-    return content
+content = si.RetrieveContent()
+
 
 def get_obj(content, vimtype, name):
     obj = None
@@ -73,7 +72,7 @@ def wait_for_task(task):
             task_done = True
 
 
-def Datacenter (datacenter_name, content):
+def Datacenter (datacenter_name):
     datacenter = get_obj(content, [vim.Datacenter], datacenter_name)
     if  datacenter.name == datacenter_name:
         return datacenter
@@ -84,7 +83,7 @@ def Datacenter (datacenter_name, content):
 
 
 
-def Cluster(content):
+def Cluster():
     cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
     if cluster == None:
         print('Not found ClusterName: '+ cluster_name)
@@ -93,7 +92,7 @@ def Cluster(content):
 
 
 
-def Template(content, template_name):
+def Template(template_name):
     template_name = get_obj(content, [vim.VirtualMachine], template_name)
     if template_name == None:
         print('Not found template name: ' + template_name)
@@ -101,7 +100,7 @@ def Template(content, template_name):
         return template_name
 
 
-def Folder_Dest (content, Datacenter, folder_name_vm):
+def Folder_Dest (Datacenter, folder_name_vm):
     destfolder = get_obj(content, [vim.Folder], folder_name_vm)
     if destfolder == None:
         Datacenter.vmFolder.CreateFolder(folder_name_vm)
@@ -111,13 +110,14 @@ def Folder_Dest (content, Datacenter, folder_name_vm):
         return destfolder
 
 
-def PortGroup(content, vm_net_address):
+def PortGroup(vm_net_address):
     try:
         portgroup_conf_pars = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][0]
         portgroup = get_obj(content, [vim.Network], portgroup_conf_pars)
         return portgroup
     except:
         print ('Not config file in ' + Datacenter(datacenter_name).name + ' or ' + vm_net_address )
+
 
 
 def change_port_group(vm):
@@ -256,7 +256,7 @@ def disk_vm_resize(vm, vm_disk_size):
 
 
 
-def Annotation_VM(vm, descriptinon ):
+def Annotation_VM(vm, descriptinon):
     spec = vim.vm.ConfigSpec()
     spec.annotation = descriptinon
     task = vm.ReconfigVM_Task(spec)
@@ -400,5 +400,56 @@ def ipam_get_ip(hostname, infraname, cidr):
 
 
 
-Customiz_Os()
+#Customiz_Os()
+
+
+def Create_VM_localstore():
+    try:
+        datacenter = Datacenter(datacenter_name)
+        print (datacenter)
+        choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
+        folder = Folder_Dest(datacenter, folder_name_vm)
+        esxi = Choice_host(Cluster(), choice_esxi)
+        datastore = Choice_Store(Cluster(), choice_esxi)
+        template = Template(template_name)
+        print(template)
+        relospec = vim.vm.RelocateSpec()
+        relospec.datastore = datastore
+        relospec.host = esxi
+        clonespec = vim.vm.CloneSpec()
+        clonespec.location = relospec
+    except:
+        print("Error! ", sys.exc_info())
+        quit()
+
+    print("Cloning VM: " + template.name + ' to ' + vm_name)
+    print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
+    task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
+    print(task.info)
+    with tqdm.tqdm(total=100) as pbar:
+        while task.info.progress != None:
+            cur_perc = int(task.info.progress)
+            pbar.update(cur_perc - pbar.n)
+            if cur_perc == 95:
+                break
+    time.sleep(3)
+    print (task.info.result)
+    try:
+        if task.info.state == 'success':
+            vm = task.info.result
+    except:
+        if task.info.state == 'error':
+            print("Clon vm error")
+
+
+
+
+
+
+
+
+
+Create_VM_localstore()
+
+
 
