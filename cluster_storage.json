@@ -1,0 +1,30 @@
+{
+  "Datacenter-Linx": {
+    "linx-cluster01": [
+      "LocalStore"
+    ]
+  },
+  "Datacenter-StoreData": {
+    "StoreData-Cluster": [
+      "SAN"
+    ]
+  },
+  "PHX": {
+    "AKB-Cluster": [
+      "LocalStore"
+    ],
+    "infra": [
+      "LocalStore"
+    ]
+  },
+  "ATK": {
+    "cluster-infra": [
+      "SAN"
+    ],
+    "Khut-CL1": [
+      "SAN"
+    ]
+  }
+}
+
+

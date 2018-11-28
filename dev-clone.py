@@ -16,6 +16,7 @@ import requests
 config_vcenter = 'vcenter.json'
 config_network = 'network.json'
 config_template = ''
+config_storage_type = 'Cluster_storage.json'
 
 storage_type = "LocalStore" # san , nas
 
@@ -26,7 +27,9 @@ template_name = 'template_centos7.5'
 vm_net_address = '172.20.20.0/24'
 folder_name_vm = 'ewwwwe'
 vm_data_expare = '10.10.19'
-
+descriptinon = 'test'
+user_api = 'ansible'
+pass_api = 'qwerty123'
 vm_name = 'testvm-clone'
 vm_disk_size = 300
 vm_ram = 8
@@ -72,7 +75,7 @@ def wait_for_task(task):
             task_done = True
 
 
-def Datacenter (datacenter_name):
+def Get_Datacenter_obj (datacenter_name):
     datacenter = get_obj(content, [vim.Datacenter], datacenter_name)
     if  datacenter.name == datacenter_name:
         return datacenter
@@ -80,10 +83,7 @@ def Datacenter (datacenter_name):
         print ('Not found: ' +  datacenter_name)
 
 
-
-
-
-def Cluster():
+def Get_Cluster_obj(cluster_name):
     cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
     if cluster == None:
         print('Not found ClusterName: '+ cluster_name)
@@ -91,40 +91,40 @@ def Cluster():
         return cluster
 
 
-
-def Template(template_name):
-    template_name = get_obj(content, [vim.VirtualMachine], template_name)
-    if template_name == None:
-        print('Not found template name: ' + template_name)
+###Возвращает объект ВМ
+def Get_VM_obj(vm_name):
+    vm_name = get_obj(content, [vim.VirtualMachine], vm_name)
+    if vm_name == None:
+        print('Not found template name: ' + vm_name)
     else:
-        return template_name
+        return vm_name
 
 
-def Folder_Dest (Datacenter, folder_name_vm):
+###Возвращает объект фолдера, если его нету то создается.
+def Get_Folder_Dest_obj (Datacenter_obj, folder_name_vm):
     destfolder = get_obj(content, [vim.Folder], folder_name_vm)
     if destfolder == None:
-        Datacenter.vmFolder.CreateFolder(folder_name_vm)
+        Datacenter_obj.vmFolder.CreateFolder(folder_name_vm)
         destfolder = get_obj(content, [vim.Folder], folder_name_vm)
         return destfolder
     else:
         return destfolder
 
 
-def PortGroup(vm_net_address):
+def Get_PortGroup_obj(Datacenter_obj, vm_net_address):
     try:
-        portgroup_conf_pars = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][0]
+        portgroup_conf_pars = Json_Parser(config_network)[Datacenter_obj.name][vm_net_address][0]
         portgroup = get_obj(content, [vim.Network], portgroup_conf_pars)
         return portgroup
     except:
-        print ('Not config file in ' + Datacenter(datacenter_name).name + ' or ' + vm_net_address )
+        print ('Not config file in ' + Datacenter_obj.name + ' or ' + vm_net_address )
 
 
+def Change_PortGroup(vm_obj, PortGroup_obj):
 
-def change_port_group(vm):
-
-    vm_portgroup = PortGroup(vm_net_address)
+    vm_portgroup = PortGroup_obj(vm_net_address)
     device_change = []
-    for device in vm.config.hardware.device:
+    for device in vm_obj.config.hardware.device:
         if isinstance(device, vim.vm.device.VirtualEthernetCard):
             nicspec = vim.vm.device.VirtualDeviceSpec()
             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
@@ -141,14 +141,13 @@ def change_port_group(vm):
             nicspec.device.connectable.allowGuestControl = True
             device_change.append(nicspec)
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-    task = vm.ReconfigVM_Task(config_spec)
+    task = vm_obj.ReconfigVM_Task(config_spec)
     wait_for_task(task)
 
 
-
-def Choice_Esxi(Cluster, storage_type, vm_ram, vm_disk_size):
+def Load_Average_Esxi(Cluster_obj, storage_type, vm_ram, vm_disk_size):
     host_list = []
-    for host in Cluster.host:
+    for host in Cluster_obj.host:
         capacity_ram = int(host.summary.hardware.memorySize)
         used_ram = int(host.summary.quickStats.overallMemoryUsage) * 1024 * 1024
         free_mem_perc = 100 - ((used_ram + vm_ram) / capacity_ram * 100)
@@ -165,15 +164,17 @@ def Choice_Esxi(Cluster, storage_type, vm_ram, vm_disk_size):
     return esxi_host
 
 
-def Choice_host(Cluster, Choice_Esxi):
-    for host in Cluster.host:
-        if host.name == Choice_Esxi:
+#####return ESXI-host
+def Get_Choice_esxi_obj(Cluster_obj, Load_Average_Esxi):
+    for host in Cluster_obj.host:
+        if host.name == Load_Average_Esxi:
             return host
 
 
-def Choice_Store(Cluster, Choice_Esxi):
-    for host in Cluster.host:
-        if host.name == Choice_Esxi:
+#####return ESXI-localstore
+def Get_Choice_Storage_obj(Cluster_obj, Load_Average_Esxi):
+    for host in Cluster_obj.host:
+        if host.name == Load_Average_Esxi:
             for storage_name in host.datastore:
                 if storage_name.parent.name == storage_type:
                     return storage_name
@@ -181,50 +182,47 @@ def Choice_Store(Cluster, Choice_Esxi):
                     print('No type datastore')
 
 
+#
+# def Clone_vm_localstore():
+#     datacenter = Datacenter (datacenter_name)
+#     choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
+#     folder = Folder_Dest(datacenter, folder_name_vm)
+#     esxi = Choice_host(Cluster(), choice_esxi)
+#     datastore =  Choice_Store(Cluster(), choice_esxi)
+#     template = Template(template_name)
+#
+#     relospec = vim.vm.RelocateSpec()
+#     relospec.datastore = datastore
+#     # relospec.pool = cluster.resourcePool
+#     relospec.host = esxi
+#     # print(resource_pool.name)
+#     clonespec = vim.vm.CloneSpec()
+#     clonespec.location = relospec
+#     #clonespec.powerOn = power_on
+#     print ("Cloning VM: " + template.name + ' to ' + vm_name )
+#     print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
+#     task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
+#     with tqdm.tqdm(total=100) as pbar:
+#         while task.info.progress != None:
+#             cur_perc = int(task.info.progress)
+#             pbar.update(cur_perc - pbar.n)
+#             if cur_perc == 95:
+#                 break
 
-def Clone_vm_localstore():
-    datacenter = Datacenter (datacenter_name)
-    choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
-    folder = Folder_Dest(datacenter, folder_name_vm)
-    esxi = Choice_host(Cluster(), choice_esxi)
-    datastore =  Choice_Store(Cluster(), choice_esxi)
-    template = Template(template_name)
-
-    relospec = vim.vm.RelocateSpec()
-    relospec.datastore = datastore
-    # relospec.pool = cluster.resourcePool
-    relospec.host = esxi
-    # print(resource_pool.name)
-    clonespec = vim.vm.CloneSpec()
-    clonespec.location = relospec
-    #clonespec.powerOn = power_on
-    print ("Cloning VM: " + template.name + ' to ' + vm_name )
-    print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
-    task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
-    with tqdm.tqdm(total=100) as pbar:
-        while task.info.progress != None:
-            cur_perc = int(task.info.progress)
-            pbar.update(cur_perc - pbar.n)
-            if cur_perc == 95:
-                break
-
-def Cpu_Mem_Reconfig(vm, core_cpu, sock_cpu, ram_mb):
+def Cpu_Mem_Reconfig(vm_obj, vm_cpu, vm_ram):
     cspec = vim.vm.ConfigSpec()
     cspec.cpuHotAddEnabled = True
     cspec.memoryHotAddEnabled = True
-    cspec.numCPUs = 4
+    cspec.numCPUs = vm_cpu
     cspec.numCoresPerSocket = 1
-    cspec.memoryMB = 1024
-    vm.Reconfigure(cspec)
+    cspec.memoryMB = int(vm_ram * 1024)
+    vm_obj.Reconfigure(cspec)
 
 
 
 
-
-
-def disk_vm_resize(vm, vm_disk_size):
-
-    for dev in vm.config.hardware.device:
+def disk_vm_resize(vm_obj, vm_disk_size):
+    for dev in vm_obj.config.hardware.device:
         if hasattr(dev.backing, 'fileName'):
             if  'Hard disk 1'  ==  dev.deviceInfo.label:
                 capacity_in_kb = dev.capacityInKB
@@ -249,33 +247,36 @@ def disk_vm_resize(vm, vm_disk_size):
     if dev_changes != []:
         spec = vim.vm.ConfigSpec()
         spec.deviceChange = dev_changes
-        task = vm.ReconfigVM_Task(spec=spec)
+        task = vm_obj.ReconfigVM_Task(spec=spec)
     else:
          print('Task resize disk Error')
 
 
 
 
-def Annotation_VM(vm, descriptinon):
+def Annotation_VM(vm_obj, descriptinon):
     spec = vim.vm.ConfigSpec()
     spec.annotation = descriptinon
-    task = vm.ReconfigVM_Task(spec)
+    task = vm_obj.ReconfigVM_Task(spec)
     wait_for_task(task)
+
+
+
 
 #vm, ip, netmask, gw, dns_prefix, dns_list
 
-def Customiz_Os(vm, ip, netmask, gw, dns_prefix, dns_list):
-    netmask_vm = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][2]
-    gateway_vm = Json_Parser(config_network)[Datacenter(datacenter_name).name][vm_net_address][1]
-    dns_prefix = Json_Parser(config_network)[Datacenter(datacenter_name).name]["dnsprefix"][0]
-    dns_servers = Json_Parser(config_network)[Datacenter(datacenter_name).name]["dnslist"][0]
+def Customiz_Os(Datacenter_obj, vm_obj, vm_ip_address, vm_net_address):
 
-
-
+    netmask_vm = Json_Parser(config_network)[Datacenter_obj(datacenter_name).name][vm_net_address][2]
+    gateway_vm = Json_Parser(config_network)[Datacenter_obj(datacenter_name).name][vm_net_address][1]
+    dns_prefix = Json_Parser(config_network)[Datacenter_obj(datacenter_name).name]["dnsprefix"][0]
+    dns_server_1 = Json_Parser(config_network)[Datacenter_obj(datacenter_name).name]["dnslist"][0]
+    dns_server_2 = Json_Parser(config_network)[Datacenter_obj(datacenter_name).name]["dnslist"][1]
+    dns_servers = [dns_server_1, dns_server_2]
 
     def Nix_Customiz():
+
         adaptermap = vim.vm.customization.AdapterMapping()
-        # globalip = vim.vm.customization.GlobalIPSettings()
         adaptermap.adapter = vim.vm.customization.IPSettings()
         adaptermap.adapter.ip = vim.vm.customization.FixedIp()
         adaptermap.adapter.ip.ipAddress = ip
@@ -283,17 +284,17 @@ def Customiz_Os(vm, ip, netmask, gw, dns_prefix, dns_list):
         adaptermap.adapter.gateway = gateway_vm
         adaptermap.adapter.dnsDomain = dns_prefix
         globalip = vim.vm.customization.GlobalIPSettings()
-        globalip.IPSetings.dnsServerList = dns_servers
+        globalip.dnsServerList = dns_servers
         ident = vim.vm.customization.LinuxPrep(domain='srv.local',
-                                               hostName=vim.vm.customization.FixedName(name=vm_name))
+                                               hostName=vim.vm.customization.FixedName(name=vm_obj.name))
         customspec = vim.vm.customization.Specification()
         customspec.identity = ident
         customspec.nicSettingMap = [adaptermap]
         customspec.globalIPSettings = globalip
-        task = vm.Customize(spec=customspec)
+        task = vm_obj.Customize(spec=customspec)
+
 
     def Win_Customiz():
-
         # https://github.com/vmware/pyvmomi/issues/261
 
         adaptermap = vim.vm.customization.AdapterMapping()
@@ -323,12 +324,12 @@ def Customiz_Os(vm, ip, netmask, gw, dns_prefix, dns_list):
         customspec.identity = ident
         customspec.nicSettingMap = [adaptermap]
         customspec.globalIPSettings = globalip
-        task = vm.Customize(spec=customspec)
+        task = vm_obj.Customize(spec=customspec)
 
     guest_id_win = ['windows7Server64Guest', 'windows8Server64Guest']
     guest_id_nix = ['centos64Guest', 'centos7_64Guest', 'ubuntu64Guest']
 
-    vm_guest_id = vm.guest.guestId
+    vm_guest_id = vm.config.guestId
     if vm_guest_id in guest_id_win:
         Win_Customiz()
     elif vm_guest_id in guest_id_nix:
@@ -398,58 +399,82 @@ def ipam_get_ip(hostname, infraname, cidr):
 
 
 
-
-
-#Customiz_Os()
-
-
-def Create_VM_localstore():
+def Storage_Type(Datacenter_obj, Cluster_obj):
     try:
-        datacenter = Datacenter(datacenter_name)
-        print (datacenter)
-        choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
-        folder = Folder_Dest(datacenter, folder_name_vm)
-        esxi = Choice_host(Cluster(), choice_esxi)
-        datastore = Choice_Store(Cluster(), choice_esxi)
-        template = Template(template_name)
-        print(template)
+        storage_type = Json_Parser(config_storage_type)[Datacenter_obj.name][Cluster_obj.name][0]
+        return storage_type
+    except:
+        print('Error parse json storage_type')
+
+
+
+
+def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template_name, vm_net_address, vm_name,
+                         descriptinon, vm_disk_size, vm_ram, vm_cpu ):
+    try:
+        Datacenter_obj = Get_Datacenter_obj(datacenter_name)
+        Cluster_obj = Get_Cluster_obj(cluster_name)
+        #storage_type = Storage_Type(Datacenter_obj, Cluster_obj)
+        storage_type = "LocalStore"
+        choice_esxi = Load_Average_Esxi(Cluster_obj, storage_type, vm_ram, vm_disk_size)
+        esxi = Get_Choice_esxi_obj(Cluster_obj, choice_esxi)
+        datastore = Get_Choice_Storage_obj(Cluster_obj, choice_esxi)
+        folder = Get_Folder_Dest_obj(Datacenter_obj, folder_name_vm)
+        template = Get_VM_obj(template_name)
+        PortGroup_obj = Get_PortGroup_obj(Datacenter_obj, vm_net_address)
+    except:
+        print('Error Create varible',sys.exc_info())
+        quit()
+    try:
         relospec = vim.vm.RelocateSpec()
         relospec.datastore = datastore
         relospec.host = esxi
         clonespec = vim.vm.CloneSpec()
         clonespec.location = relospec
     except:
-        print("Error! ", sys.exc_info())
+        print('Error Create relospec and clonspec', sys.exc_info())
         quit()
 
     print("Cloning VM: " + template.name + ' to ' + vm_name)
     print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
     task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
-    print(task.info)
+
     with tqdm.tqdm(total=100) as pbar:
         while task.info.progress != None:
             cur_perc = int(task.info.progress)
             pbar.update(cur_perc - pbar.n)
             if cur_perc == 95:
                 break
+
     time.sleep(3)
-    print (task.info.result)
     try:
         if task.info.state == 'success':
-            vm = task.info.result
+            new_vm_obj = task.info.result
+            print('====== Cloning VM  Success ======')
     except:
         if task.info.state == 'error':
-            print("Clon vm error")
+            print("Clon vm error", sys.exc_info())
+            quit()
+
+
+    Cpu_Mem_Reconfig(new_vm_obj, vm_cpu, vm_ram)
+    disk_vm_resize(new_vm_obj, vm_disk_size)
+    Annotation_VM(new_vm_obj, descriptinon)
+    vm_portgroup = Get_PortGroup_obj(Datacenter_obj, vm_net_address)
+    Change_PortGroup(new_vm_obj, vm_portgroup)
+    ip = ipam_get_ip(vm_name, descriptinon, vm_net_address)
+    Customiz_Os(new_vm_obj, ip, vm_net_address)
 
 
 
 
 
+Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
+                     folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
+                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
 
 
 
-
-Create_VM_localstore()
 
 
 
