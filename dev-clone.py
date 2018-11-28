@@ -40,16 +40,23 @@ vm_cpu = 2
 
 
 def Json_Parser(config_file):
+    """ Json parser config (config_vcenter, config_network """
     config = json.loads(open(config_file).read())
     return config
 
-
-si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
+def Connect_vCenter(vcenter_host):
+    try:
+        si = connect.SmartConnectNoSSL(host=vcenter_host, user=Json_Parser(config_vcenter)[vcenter_host][0],
                                pwd=Json_Parser(config_vcenter)[vcenter_host][1], port=443)
-content = si.RetrieveContent()
+        content = si.RetrieveContent()
+        return content
+    except:
+        print('Error connect: '+ vcenter_host)
+
 
 
 def get_obj(content, vimtype, name):
+    """ return object (datacenter, cluster, vm.... """
     obj = None
     container = content.viewManager.CreateContainerView(
         content.rootFolder, vimtype, True)
@@ -62,6 +69,8 @@ def get_obj(content, vimtype, name):
             obj = c
             break
     return obj
+
+
 
 def wait_for_task(task):
     """ wait for a vCenter task to finish """
@@ -76,14 +85,18 @@ def wait_for_task(task):
 
 
 def Get_Datacenter_obj (datacenter_name):
+    """ return object datacenter, if he is """
     datacenter = get_obj(content, [vim.Datacenter], datacenter_name)
-    if  datacenter.name == datacenter_name:
-        return datacenter
-    else:
-        print ('Not found: ' +  datacenter_name)
+    try:
+        if datacenter.name == datacenter_name:
+            return datacenter
+    except:
+        print ('Incorrect Datacenter: ' +  datacenter_name)
+        quit()
 
 
 def Get_Cluster_obj(cluster_name):
+    """ return object Cluster obj, if he is """
     cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
     if cluster == None:
         print('Not found ClusterName: '+ cluster_name)
@@ -91,8 +104,9 @@ def Get_Cluster_obj(cluster_name):
         return cluster
 
 
-###Возвращает объект ВМ
+
 def Get_VM_obj(vm_name):
+    """ return object VM, if he is """
     vm_name = get_obj(content, [vim.VirtualMachine], vm_name)
     if vm_name == None:
         print('Not found template name: ' + vm_name)
@@ -100,8 +114,9 @@ def Get_VM_obj(vm_name):
         return vm_name
 
 
-###Возвращает объект фолдера, если его нету то создается.
+
 def Get_Folder_Dest_obj (Datacenter_obj, folder_name_vm):
+    """ return object folder obj, if not, then it creates  """
     destfolder = get_obj(content, [vim.Folder], folder_name_vm)
     if destfolder == None:
         Datacenter_obj.vmFolder.CreateFolder(folder_name_vm)
@@ -112,6 +127,7 @@ def Get_Folder_Dest_obj (Datacenter_obj, folder_name_vm):
 
 
 def Get_PortGroup_obj(Datacenter_obj, vm_net_address):
+    """ return object PortGroup ===> json  """
     try:
         portgroup_conf_pars = Json_Parser(config_network)[Datacenter_obj.name][vm_net_address][0]
         portgroup = get_obj(content, [vim.Network], portgroup_conf_pars)
@@ -121,7 +137,7 @@ def Get_PortGroup_obj(Datacenter_obj, vm_net_address):
 
 
 def Change_PortGroup(vm_obj, PortGroup_obj):
-
+    """ change portgroup on VM, from func Get_PortGroup_obj ===> json """
     vm_portgroup = PortGroup_obj(vm_net_address)
     device_change = []
     for device in vm_obj.config.hardware.device:
@@ -146,6 +162,7 @@ def Change_PortGroup(vm_obj, PortGroup_obj):
 
 
 def Load_Average_Esxi(Cluster_obj, storage_type, vm_ram, vm_disk_size):
+    """ return  esxi-host (name), if  Free-RAM > 10% and Free-Storage > 15 % + vm(ram, disk)"""
     host_list = []
     for host in Cluster_obj.host:
         capacity_ram = int(host.summary.hardware.memorySize)
@@ -164,15 +181,16 @@ def Load_Average_Esxi(Cluster_obj, storage_type, vm_ram, vm_disk_size):
     return esxi_host
 
 
-#####return ESXI-host
+
 def Get_Choice_esxi_obj(Cluster_obj, Load_Average_Esxi):
+    """ return object esxi, from func Load_Average_Esxi """
     for host in Cluster_obj.host:
         if host.name == Load_Average_Esxi:
             return host
 
 
-#####return ESXI-localstore
 def Get_Choice_Storage_obj(Cluster_obj, Load_Average_Esxi):
+    """ return object storage, from func Load_Average_Esxi """
     for host in Cluster_obj.host:
         if host.name == Load_Average_Esxi:
             for storage_name in host.datastore:
@@ -180,6 +198,7 @@ def Get_Choice_Storage_obj(Cluster_obj, Load_Average_Esxi):
                     return storage_name
                 else:
                     print('No type datastore')
+
 
 
 #
@@ -411,6 +430,7 @@ def Storage_Type(Datacenter_obj, Cluster_obj):
 
 def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template_name, vm_net_address, vm_name,
                          descriptinon, vm_disk_size, vm_ram, vm_cpu ):
+
     try:
         Datacenter_obj = Get_Datacenter_obj(datacenter_name)
         Cluster_obj = Get_Cluster_obj(cluster_name)
@@ -469,12 +489,14 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
 
 
 
-Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
-                     folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
-                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
+#Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
+ #                    folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
+#                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
+
+
+#print(Get_Datacenter_obj(datacenter_name='123asdf23ed'))
 
 
 
 
-
-
+conect = content(vcenter_host='vc-linx.srv.local')
