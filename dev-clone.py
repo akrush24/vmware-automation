@@ -16,7 +16,7 @@ import requests
 config_vcenter = 'vcenter.json'
 config_network = 'network.json'
 config_template = ''
-config_storage_type = 'Cluster_storage.json'
+config_storage_type = 'cluster_storage.json'
 
 storage_type = "LocalStore" # san , nas
 
@@ -52,8 +52,9 @@ def Connect_vCenter(vcenter_host):
         return content
     except:
         print('Error connect: '+ vcenter_host)
+        quit()
 
-
+content = Connect_vCenter(vcenter_host)
 
 def get_obj(content, vimtype, name):
     """ return object (datacenter, cluster, vm.... """
@@ -69,7 +70,6 @@ def get_obj(content, vimtype, name):
             obj = c
             break
     return obj
-
 
 
 def wait_for_task(task):
@@ -97,12 +97,15 @@ def Get_Datacenter_obj (datacenter_name):
 
 def Get_Cluster_obj(cluster_name):
     """ return object Cluster obj, if he is """
-    cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
-    if cluster == None:
-        print('Not found ClusterName: '+ cluster_name)
-    else:
-        return cluster
-
+    try:
+        cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
+        if cluster == None:
+            print('Not found ClusterName: '+ cluster_name)
+        else:
+            return cluster
+    except:
+        print('Error cluster_obj ' + cluster_name)
+        quit()
 
 
 def Get_VM_obj(vm_name):
@@ -117,6 +120,7 @@ def Get_VM_obj(vm_name):
 
 def Get_Folder_Dest_obj (Datacenter_obj, folder_name_vm):
     """ return object folder obj, if not, then it creates  """
+
     destfolder = get_obj(content, [vim.Folder], folder_name_vm)
     if destfolder == None:
         Datacenter_obj.vmFolder.CreateFolder(folder_name_vm)
@@ -200,33 +204,6 @@ def Get_Choice_Storage_obj(Cluster_obj, Load_Average_Esxi):
                     print('No type datastore')
 
 
-
-#
-# def Clone_vm_localstore():
-#     datacenter = Datacenter (datacenter_name)
-#     choice_esxi = Choice_Esxi(Cluster(), storage_type, vm_ram, vm_disk_size)
-#     folder = Folder_Dest(datacenter, folder_name_vm)
-#     esxi = Choice_host(Cluster(), choice_esxi)
-#     datastore =  Choice_Store(Cluster(), choice_esxi)
-#     template = Template(template_name)
-#
-#     relospec = vim.vm.RelocateSpec()
-#     relospec.datastore = datastore
-#     # relospec.pool = cluster.resourcePool
-#     relospec.host = esxi
-#     # print(resource_pool.name)
-#     clonespec = vim.vm.CloneSpec()
-#     clonespec.location = relospec
-#     #clonespec.powerOn = power_on
-#     print ("Cloning VM: " + template.name + ' to ' + vm_name )
-#     print("ESXI: " + choice_esxi + "   DATASTORE: " + datastore.name)
-#     task = template.Clone(folder=folder, name=vm_name, spec=clonespec)
-#     with tqdm.tqdm(total=100) as pbar:
-#         while task.info.progress != None:
-#             cur_perc = int(task.info.progress)
-#             pbar.update(cur_perc - pbar.n)
-#             if cur_perc == 95:
-#                 break
 
 def Cpu_Mem_Reconfig(vm_obj, vm_cpu, vm_ram):
     cspec = vim.vm.ConfigSpec()
@@ -418,13 +395,13 @@ def ipam_get_ip(hostname, infraname, cidr):
 
 
 
+
 def Storage_Type(Datacenter_obj, Cluster_obj):
     try:
         storage_type = Json_Parser(config_storage_type)[Datacenter_obj.name][Cluster_obj.name][0]
         return storage_type
     except:
         print('Error parse json storage_type')
-
 
 
 
@@ -489,6 +466,8 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
 
 
 
+
+
 #Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
  #                    folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
 #                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
@@ -496,7 +475,27 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
 
 #print(Get_Datacenter_obj(datacenter_name='123asdf23ed'))
 
+#
+# Datacenter_obj = Get_Datacenter_obj(datacenter_name)
+# Cluster_obj = Get_Cluster_obj(cluster_name)
+# Storage_Type(Datacenter_obj, Cluster_obj)
+
+#print(Json_Parser(config_storage_type)[Datacenter_obj.name][Cluster_obj.name][0])
+#Get_Cluster_obj(cluster_name)
+
+
+def clone_cluster_drs(folder_name_vm, datastore_name):
+    Datacenter_obj = Get_Datacenter_obj(datacenter_name)
+    Cluster_obj =  Cluster_obj = Get_Cluster_obj(cluster_name)
+    folder = Get_Folder_Dest_obj(Datacenter_obj, folder_name_vm)
+
+
+    if datastore_name:
+        datastore = get_obj(content, [vim.Datastore], datastore_name)
+    else:
+        datastore = get_obj(
+            content, [vim.Datastore], template.datastore[0].info.name)
 
 
 
-conect = content(vcenter_host='vc-linx.srv.local')
+
