@@ -73,16 +73,15 @@ def get_obj(content, vimtype, name):
 
 
 
-class ObjectContent():
+class ObjectContent:
     """docstring"""
-    def __init__(self, vm_name, vm_cpu, vm_ram, vm_disk, vm_descriptinon):
+    def __init__(self, datacenter_name, cluster_name, vm_name ):
         """Constructor"""
         self.datacenter = datacenter_name
         self.cluster = cluster_name
-        self.vm = vm_name
-        self.vm_disk = vm_disk
-        self.vm_portgroup = vm_net_address
-        self.folder = folder_vm
+        self.vm_name = vm_name
+        # self.vm_portgroup = vm_net_address
+        # self.folder = folder_vm
 
 
     def datacenter_obj(datacenter_name):
@@ -95,12 +94,11 @@ class ObjectContent():
             print('Incorrect Datacenter: ' + datacenter_name)
             quit()
 
-
 #####
-    def cluster_obj(cluster_name):
+    def cluster_obj(self):
         """ return object Cluster obj, if he is """
         try:
-            cluster = get_obj(content, [vim.ClusterComputeResource], cluster_name)
+            cluster = get_obj(content, [vim.ClusterComputeResource], self.cluster)
             if cluster == None:
                 print('Not found ClusterName: '+ cluster_name)
             else:
@@ -110,16 +108,18 @@ class ObjectContent():
             quit()
 
 #####
-    def vm_obj(vm_name):
+    def vm_obj(self):
         """ return object VM, if he is """
-        vm_name = get_obj(content, [vim.VirtualMachine], vm_name)
-        if vm_name == None:
-            print('Not found template name: ' + vm_name)
-        else:
-            return vm_name
+        try:
+            vm_name = get_obj(content, [vim.VirtualMachine], self.vm_name)
+            if vm_name == None:
+                print('Not found template name: ' + vm_name)
+            else:
+                return vm_name
+        except:
+            print('notfound VM ')
 
 ####
-
     def folder_obj (datacenter_obj, folder_name_vm):
         """ return object folder obj, if not, then it creates  """
 
@@ -145,27 +145,31 @@ class ObjectContent():
 
 
 
-class VirtualMashin(object):
+
+class VirtualMashin():
     """docstring"""
 
-    def __init__(self, vm_name, vm_cpu, vm_ram, vm_disk, vm_descriptinon):
+    def __init__(self, vm_name, vm_cpu, vm_ram, vm_disk):
         """Constructor"""
+
         self.vm_name = vm_name
         self.vm_cpu = vm_cpu
         self.vm_ram = vm_ram
         self.vm_disk = vm_disk
-        self.vm_portgroup = vm_net_address
-        self.descriptinon = vm_descriptinon
 
 
-
-    def get_vm_obj(self):
+    def vm_obj(self):
         """ return object VM, if he is """
-        vm_name = get_obj(content, [vim.VirtualMachine], self.vm_name)
-        if vm_name == None:
-            print('Not found template name: ' + self.vm_name)
-        else:
-            return vm_name
+        try:
+            vm_name = get_obj(content, [vim.VirtualMachine], self.vm_name)
+            if vm_name == None:
+                print('Not found template name: ' + vm_name)
+            else:
+                self.__vm_obj = vm_name
+
+        except:
+            print('notfound VM ')
+
 
 
     def cpu_reconfig(self):
@@ -173,13 +177,13 @@ class VirtualMashin(object):
         cspec.cpuHotAddEnabled = True
         cspec.numCPUs = self.vm_cpu
         cspec.numCoresPerSocket = 1
-        vm_obj.Reconfigure(cspec)
+        self.__vm_obj.Reconfigure(cspec)
 
     def ram_reconfig(self):
         cspec = vim.vm.ConfigSpec()
         cspec.memoryHotAddEnabled = True
         cspec.memoryMB = int(self.vm_ram * 1024)
-        vm_obj.Reconfigure(cspec)
+        self.__vm_obj.Reconfigure(cspec)
 
 
     def disk_resize(self):
@@ -218,15 +222,30 @@ class VirtualMashin(object):
         spec.annotation = descriptinon
         task = vm_obj.ReconfigVM_Task(spec)
 
+        
 
 
 
 if __name__ == "__main__":
-    car = vm("testclonevm", 2, 2, 40)
+    car = VirtualMashin("testclonevm", 2, 2, 40)
+    car.vm_obj()
+    car.cpu_reconfig()
 
 
-    vm_obj = car.Get_VM_obj()
-    car.disk_vm_resize()
+
+
+
+   # vm_obj = car.vm_obj()
+   # ObjectContent.vm_obj("testclonevm")
+    #car.cpu_reconfig()
+
+
+
+
+
+    #
+    # vm_obj = car.Get_VM_obj()
+    # car.disk_vm_resize()
 
 
 
