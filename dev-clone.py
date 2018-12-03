@@ -468,6 +468,9 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
 
 
 
+
+
+
 #Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
  #                    folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
 #                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
