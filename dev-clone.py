@@ -448,32 +448,27 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
         if task.info.state == 'success':
             new_vm_obj = task.info.result
             print('====== Cloning VM  Success ======')
+            Cpu_Mem_Reconfig(new_vm_obj, vm_cpu, vm_ram)
+            disk_vm_resize(new_vm_obj, vm_disk_size)
+            Annotation_VM(new_vm_obj, descriptinon)
+            vm_portgroup = Get_PortGroup_obj(Datacenter_obj, vm_net_address)
+            Change_PortGroup(new_vm_obj, vm_portgroup)
+            ip = ipam_get_ip(vm_name, descriptinon, vm_net_address)
+            Customiz_Os(new_vm_obj, ip, vm_net_address)
     except:
         if task.info.state == 'error':
             print("Clon vm error", sys.exc_info())
             quit()
 
 
-    Cpu_Mem_Reconfig(new_vm_obj, vm_cpu, vm_ram)
-    disk_vm_resize(new_vm_obj, vm_disk_size)
-    Annotation_VM(new_vm_obj, descriptinon)
-    vm_portgroup = Get_PortGroup_obj(Datacenter_obj, vm_net_address)
-    Change_PortGroup(new_vm_obj, vm_portgroup)
-    ip = ipam_get_ip(vm_name, descriptinon, vm_net_address)
-    Customiz_Os(new_vm_obj, ip, vm_net_address)
 
 
 
 
 
-
-
-
-
-
-#Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
- #                    folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
-#                     vm_name='testclonevm', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
+Create_VM_localstore(datacenter_name = 'Datacenter-Linx', cluster_name='linx-cluster01',
+                    folder_name_vm = 'ewwwwe', template_name='template_centos7.5', vm_net_address='172.20.20.0/24',
+                    vm_name='testclonevm2', descriptinon='test', vm_disk_size=30, vm_ram=2, vm_cpu=2 )
 
 
 #print(Get_Datacenter_obj(datacenter_name='123asdf23ed'))
@@ -487,18 +482,18 @@ def Create_VM_localstore(datacenter_name, cluster_name, folder_name_vm, template
 #Get_Cluster_obj(cluster_name)
 
 
-def clone_cluster_drs(folder_name_vm, datastore_name):
-    Datacenter_obj = Get_Datacenter_obj(datacenter_name)
-    Cluster_obj =  Cluster_obj = Get_Cluster_obj(cluster_name)
-    folder = Get_Folder_Dest_obj(Datacenter_obj, folder_name_vm)
-
-
-    if datastore_name:
-        datastore = get_obj(content, [vim.Datastore], datastore_name)
-    else:
-        datastore = get_obj(
-            content, [vim.Datastore], template.datastore[0].info.name)
-
+# def clone_cluster_drs(folder_name_vm, datastore_name):
+#     Datacenter_obj = Get_Datacenter_obj(datacenter_name)
+#     Cluster_obj =  Cluster_obj = Get_Cluster_obj(cluster_name)
+#     folder = Get_Folder_Dest_obj(Datacenter_obj, folder_name_vm)
+#
+#
+#     if datastore_name:
+#         datastore = get_obj(content, [vim.Datastore], datastore_name)
+#     else:
+#         datastore = get_obj(
+#             content, [vim.Datastore], template.datastore[0].info.name)
+#
 
 
 
