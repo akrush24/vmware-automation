@@ -68,6 +68,7 @@ def template(vm_template):
     'template_oel_7.4',
     'template_ubuntu_1604']
     template_wind = ['template_wind2008',
+    'template_WindowsServer2008R2_SE',
     'template_WinSrv2012R2RU',
     'temp_w7_x64',
     'template_WinSrv2012R2EN']
