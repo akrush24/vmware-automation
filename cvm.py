@@ -59,6 +59,7 @@ def template(vm_template):
     'template_centos7.5',
     'template_ubuntu_16.04',
     'centos7.0-clear-v2-template',
+    'centos7.0-ext4-clear-template',
     'template_centos6.8_x86_64',
     'centos-7-es-5.1.1-template',
     'template_debian9',

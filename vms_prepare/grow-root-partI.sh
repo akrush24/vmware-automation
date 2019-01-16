@@ -1,4 +1,5 @@
 echo -e "\n++++ STAR ++++"
+echo 1 > /sys/block/sda/device/rescan
 fdisk -l /dev/sda
 
 START_SEC=`fdisk -lc /dev/sda|awk '{if($1 == "/dev/sda2"){print $2}}'`
