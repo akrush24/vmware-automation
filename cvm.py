@@ -51,6 +51,24 @@ def ipam_create_ip(hostname, infraname, cidr):
        print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
        quit()
 
+def ipam_rm_ip(ip, cidr):
+    print ("function: ipam_rm_ip("+ ip +")")
+    token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
+    headers = {'token':token}
+    cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
+    get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+
+    print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
+
+    rm_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/"+ip+"/40/"
+    rm_ip = requests.delete(url=rm_ip_url, headers=headers).json()
+    print(rm_ip)
+    #except:
+    #   print("!!! При удалении IP произошла ошибка! ",sys.exc_info())
+    #   quit()
+
+
+
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
 def template(vm_template):
@@ -67,11 +85,13 @@ def template(vm_template):
     'centos-7-docker-git-v2-template',
     'template_rhel7.4',
     'template_oel_7.4',
+    'sl24-clear-template',
     'template_ubuntu_1604']
     template_wind = ['template_wind2008',
     'template_WindowsServer2008R2_SE',
     'template_WinSrv2012R2RU',
     'temp_w7_x64',
+    'sl24-clear-template',
     'template_WinSrv2012R2EN']
     if vm_template in template_linux:
         ter_dir = './linux'

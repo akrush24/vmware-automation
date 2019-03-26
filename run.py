@@ -31,6 +31,7 @@ parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "01/01/18"]')
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
+parser.add_argument('-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
 parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
 parser.add_argument('-N', dest='NODES', help='Edit Nodes only',      action='store_true')
 parser.add_argument('--resize' , '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
@@ -73,6 +74,16 @@ if args.NODES:
       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
       quit()
 
+if args.IPRM:
+   if args.ip is None:
+      print("!!! Please enter IP")
+      quit()
+   if args.net is None:
+      print("!!! Please enter --net (ex: --net 192.168.0.0/24)")
+      quit()
+   else:
+      ipam_rm_ip(args.ip, args.net)
+      quit()
 
 if args.ONLYIP:
     print("Only reserv IP for vm :"+args.vmname)
