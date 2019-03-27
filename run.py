@@ -10,7 +10,7 @@ version = '0.0.2'
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--net', '-l',         dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM")
-parser.add_argument('--vmname', '-n',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]", required=True)
+parser.add_argument('--vmname', '-n',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]")
 parser.add_argument('--ip', dest='ip',     help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--datastor', '-ds',   dest='ds',      help="Datastore name")
 parser.add_argument('--folder',           dest='folder',  help='VM Folder in vCenter [EXMPLE: folder1/folder2]')
@@ -48,6 +48,20 @@ args = parser.parse_args()
 #    print("Please enter VM Template");
 #    quit()
 
+if args.IPRM:
+   if args.ip is None:
+      print("!!! Please enter IP")
+      quit()
+   if args.net is None:
+      print("!!! Please enter --net (ex: --net 192.168.0.0/24)")
+      quit()
+   else:
+      ipam_rm_ip(args.ip, args.net)
+      quit()
+
+if args.vmname is None:
+    print("Please enter --vmname: vmname")
+    quit()
 
 if args.EXPIRE:
     print("Set Expire for vm: "+args.vmname)
@@ -72,17 +86,6 @@ if args.NODES:
       quit()
    except:
       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
-      quit()
-
-if args.IPRM:
-   if args.ip is None:
-      print("!!! Please enter IP")
-      quit()
-   if args.net is None:
-      print("!!! Please enter --net (ex: --net 192.168.0.0/24)")
-      quit()
-   else:
-      ipam_rm_ip(args.ip, args.net)
       quit()
 
 if args.ONLYIP:
