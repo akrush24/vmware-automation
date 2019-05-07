@@ -33,7 +33,7 @@ parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPL
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
 parser.add_argument('-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
 parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
-parser.add_argument('-N', dest='NODES', help='Edit Nodes only',      action='store_true')
+parser.add_argument('-N', dest='NODES', help='Edit Nodes only', action='store_true')
 parser.add_argument('--resize' , '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
 
 #parser.add_argument('--', dest='',      help='')
