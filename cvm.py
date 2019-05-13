@@ -75,6 +75,7 @@ def template(vm_template):
     template_linux = ['template_centos7.3',
     'template_centos7.2',
     'template_centos7.5',
+    'template_centos7.5_atk',
     'template_ubuntu_16.04',
     'centos7.0-clear-v2-template',
     'centos7.0-ext4-clear-template',
