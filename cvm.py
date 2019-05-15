@@ -133,7 +133,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '192.168.14.0/23' : 'VLAN14',
                     '172.20.20.0/24'  : '172.20.20.0',
                     '172.25.16.0/24'  : '172.25.16.0',
-                    '192.168.24.0/24' : 'VLAN24-192.168.24.0', # ATC vcenter.at-consulting.ru
+                    '192.168.24.0/24' : 'VLAN_24', # ATC vcenter.at-consulting.ru
                     '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0', # ATC vcenter.at-consulting.ru
                     '192.168.194.0/24': 'ds-VLAN_194' # ATC vcenter.at-consulting.ru
 }
