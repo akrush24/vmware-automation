@@ -93,6 +93,7 @@ def template(vm_template):
     'template_WinSrv2012R2RU',
     'temp_w7_x64',
     'sl24-clear-template',
+    'shr-clear-template',
     'template_WinSrv2012R2EN']
     if vm_template in template_linux:
         ter_dir = './linux'
@@ -135,7 +136,8 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '172.25.16.0/24'  : '172.25.16.0',
                     '192.168.24.0/24' : 'VLAN_24', # ATC vcenter.at-consulting.ru
                     '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0', # ATC vcenter.at-consulting.ru
-                    '192.168.194.0/24': 'ds-VLAN_194' # ATC vcenter.at-consulting.ru
+                    '192.168.194.0/24': 'ds-VLAN_194', # ATC vcenter.at-consulting.ru
+                    '192.168.221.0/24': '192.168.221'
 }
 
         if port_int[cidr]:
