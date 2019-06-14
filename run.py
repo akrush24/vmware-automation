@@ -5,7 +5,10 @@ import argparse
 #from ipam_create_ip import ipam_create_ip
 from cvm import *
 from passwd import user_api, pass_api, vc_user, vc_pass
-version = '0.0.2'
+import datetime
+today = datetime.date.today()
+
+version = '0.0.2.1'
 
 parser = argparse.ArgumentParser()
 
@@ -29,7 +32,7 @@ parser.add_argument('--version', '-V', action='version', version='Version: '+ver
 parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL')
 parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store_true')
 
-parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "01/01/18"]')
+parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "31/01/20"]')
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
 parser.add_argument('-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
 parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
@@ -62,6 +65,11 @@ if args.IPRM:
 if args.vmname is None:
     print("Please enter --vmname: vmname")
     quit()
+
+if args.exp is None:
+    exp = today + datetime.timedelta(days = 356)
+    args.exp = exp.strftime('%d')+"."+exp.strftime('%m')+"."+exp.strftime('%Y')
+    print (args.exp)
 
 if args.EXPIRE:
     print("Set Expire for vm: "+args.vmname)
@@ -153,6 +161,7 @@ else:
 
     if args.exp is not None:
        try:
+          print(args.exp)
           print ("### Create sheduled power off "+args.vmname+" in " + args.exp)
           scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
        except:
