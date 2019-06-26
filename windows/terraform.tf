@@ -60,6 +60,10 @@ resource "vsphere_virtual_machine" "vm" {
   memory   = "${var.vm_ram}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
 
+  cpu_hot_add_enabled           = true
+  cpu_hot_remove_enabled        = true
+  memory_hot_add_enabled        = true
+
   scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
 
   network_interface {
