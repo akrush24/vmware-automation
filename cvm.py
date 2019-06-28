@@ -84,7 +84,8 @@ def template(vm_template):
     'sl24-clear-template',
     'shr-clear-template',
     'template_win2016EN',
-    'template_WinSrv2012R2EN']
+    'template_WinSrv2012R2EN',
+    'template_SD_WinSrv2012R2EN']
     if vm_template in template_linux:
         ter_dir = './linux'
         print ("### TER DIR: ["""+ter_dir+"]")

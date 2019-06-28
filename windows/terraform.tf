@@ -89,9 +89,11 @@ resource "vsphere_virtual_machine" "vm" {
         admin_password = "q1!@W@"
         product_key = "${var.vm_product_key}"
         time_zone = "145"
-      }
-
-
+        run_once_command_list = [
+          "lmgr.vbs /skms 192.168.245.30",
+          "slmgr.vbs /ato",
+          "powershell -command (Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).SizeMax)"]
+        }
 
       network_interface {
         ipv4_address = "${var.vm_ip}"
