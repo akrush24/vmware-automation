@@ -27,11 +27,11 @@ EOF
 
 ### run ###
 ```
-usage: run.py [-h] [--net NET] --vmname VMNAME [--ip IP] [--datastor DS]
+usage: run.py [-h] [--net NET] [--vmname VMNAME] [--ip IP] [--datastor DS]
               [--folder FOLDER] [--datacenter DATACENTER] [--cluster CLUSTER]
               [--dsize DSIZE] [--msize MEM] [--cpu CPU] [--desc DESC]
               [--template TEMPLATE] [--version] [--vcenter VCENTER] [--debug]
-              [--exp EXP] [--ONLYIP] [--EXPIRE] [-N] [--resize]
+              [--exp EXP] [--ONLYIP] [-IPRM] [--EXPIRE] [-N] [--resize]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -59,9 +59,10 @@ optional arguments:
   --vcenter VCENTER, -v VCENTER
                         vCenter URL
   --debug               debug mode
-  --exp EXP, -e EXP     Expiry date [EXAMPLE: --exp "01/01/18"]
+  --exp EXP, -e EXP     Expiry date [EXAMPLE: --exp "31/01/20"]
   --ONLYIP, --onlyip, -IP
                         Only IP allocation [EXAMPLE: --ONLYIP]
+  -IPRM                 Remove IP allocation
   --EXPIRE, -E          Set only expire [EXMPLE --EXPIRE]
   -N                    Edit Nodes only
   --resize, -r          Resize disk (only on Linux vms) [EXMPLE --RESIZE]
