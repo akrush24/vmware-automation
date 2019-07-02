@@ -76,7 +76,8 @@ def template(vm_template):
     'template_rhel7.4',
     'template_oel_7.4',
     'sl24-clear-template',
-    'template_ubuntu_1604']
+    'template_ubuntu_1604',
+    'template_ubuntu_18.04']
     template_wind = ['template_wind2008',
     'template_WindowsServer2008R2_SE',
     'template_WinSrv2012R2RU',
