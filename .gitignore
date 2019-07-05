@@ -1,4 +1,5 @@
 passwd.py
+parameters.py
 __pycache__
 .idea
 */terraform.tfstate
