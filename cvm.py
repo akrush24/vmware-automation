@@ -78,6 +78,7 @@ def template(vm_template):
     'sl24-clear-template',
     'template_ubuntu_1604',
     'template_ubuntu_18.04']
+
     template_wind = ['template_wind2008',
     'template_WindowsServer2008R2_SE',
     'template_WinSrv2012R2RU',
@@ -87,6 +88,7 @@ def template(vm_template):
     'template_win2016EN',
     'template_WinSrv2012R2EN',
     'template_SD_WinSrv2012R2EN']
+
     if vm_template in template_linux:
         ter_dir = './linux'
         print ("### TER DIR: ["""+ter_dir+"]")
@@ -130,7 +132,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                     '172.20.20.0/24'  : '172.20.20.0',
                     '172.25.16.0/24'  : '172.25.16.0',
                     '192.168.24.0/24' : 'VLAN_24', # ATC vcenter.at-consulting.ru
-                    '192.168.9.0/24'  : 'dvSwitch6_192.168.9.0', # ATC vcenter.at-consulting.ru
+                    '192.168.9.0/24'  : 'VLAN09', # ATC vcenter.at-consulting.ru
                     '192.168.194.0/24': 'ds-VLAN_194', # ATC vcenter.at-consulting.ru
                     '192.168.221.0/24': '192.168.221'
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.4
 
 import sys
-import argparse
+import argparse, argcomplete, requests
 #from ipam_create_ip import ipam_create_ip
 from cvm import *
 from passwd import user_api, pass_api, vc_user, vc_pass
@@ -26,7 +26,6 @@ parser.add_argument('--cpu',     '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc',    '-d', dest='desc',    help='Description')
 parser.add_argument('--template','-t', dest='template',    help='VM Template')
 
-
 parser.add_argument('--version', '-V', action='version', version='Version: '+version)
 
 parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL')
@@ -41,6 +40,7 @@ parser.add_argument('--resize' , '-r',      dest='RESIZE', help='Resize disk (on
 
 #parser.add_argument('--', dest='',      help='')
 
+argcomplete.autocomplete(parser)
 args = parser.parse_args()
 
 #if args.folder is None and args.onlyip is not 'yes':

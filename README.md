@@ -3,7 +3,17 @@
 
 ## INSTALLATION ##
 ```
-pip3 install pyVim pyVmomi requests paramiko python_terraform requests
+pip3 install pyVim pyVmomi requests argcomplete paramiko python_terraform requests 
+```
+For autocomplete in bash
+ *  https://argcomplete.readthedocs.io/en/latest/
+ *  https://github.com/kislyuk/argcomplete
+```
+pip install argcomplete
+activate-global-python-argcomplete
+
+echo 'eval "$(register-python-argcomplete YouScriptDir(ex. ./run.sh) )"' >> ~/.bashrc
+sourse ~/.bashrc
 ```
 
 ### Create Only New PHPIpam IP ###
