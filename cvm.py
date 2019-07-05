@@ -12,7 +12,7 @@ from tools import tasks
 from tools import tasks
 from tools import cli
 
-from datetime import datetime
+import datetime
 
 from subprocess import call
 
@@ -185,18 +185,13 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
 
 
 def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm, cluster):
-    folder_dc_pass = { 'vc-linx.srv.local': 'Datacenter-Linx/vm/','vcenter.at-consulting.ru': 'SAV/vm/' }
+
+    #default folders path
+    folder_dc_pass = { 'vc-linx.srv.local':'Datacenter-Linx/vm/', 'vcsa.srv.local':'PHX/vm/', 'vc-khut.srv.local':'ATK/vm/' }
 
     # for multi datacenter VCSA
-    if cluster == "Khut-CL1" or cluster == "cluster-infra":
-       folder_dc_pass['vc-khut.srv.local'] = 'ATK/vm/'
-    else:
-       folder_dc_pass['vc-khut.srv.local'] = 'Datacenter-KHUT/vm/'
-
-    if cluster == "AKB-Cluster":
-       folder_dc_pass['vcsa.srv.local'] = 'PHX/vm/'
-    if cluster == "k8s-kluster":
-       folder_dc_pass['vcsa.srv.local'] = 'PHX/vm/'
+    if cluster in ["sav-r11-cl2","sav-r24-cl1","sav-r24-cl2","sav-r24_e5-26","r24_SandyBridge","r39-cluster"]:
+       folder_dc_pass['vcsa.srv.local'] = 'ATK/vm/'
 
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
@@ -265,7 +260,7 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
        datefind = re.findall('(\w\w)',expire_vm_date)
        (d, m, y) = (datefind[0], datefind[1], datefind[len(datefind)-1])
        #dt = datetime.strptime(expire_vm_date+" 10:30", "%d/%m/%y %H:%M")
-       dt = datetime.strptime(d + "/" + m + "/" + y +" 10:30", "%d/%m/%y %H:%M")
+       dt = datetime.datetime.strptime(d + "/" + m + "/" + y +" 10:30", "%d/%m/%y %H:%M")
        print("### Expired date is: " + str(dt))
     except:
        print("!!! Invalid date specified"+expire_vm_date+"->"+str(dt))
@@ -280,7 +275,8 @@ def scheduledTask_poweroff(hostname, expire_vm_date, vc_host):
        return -1
     vm = vms[0]
     spec = vim.scheduler.ScheduledTaskSpec()
-    spec.name = 'PowerOff vm %s' % hostname
+    today = datetime.datetime.today().strftime("%d%m%Y.%H%M")
+    spec.name = '[%s] PowerOff [%s]' % (today, hostname)
     spec.description = 'expire date order vm'
     spec.scheduler = vim.scheduler.OnceTaskScheduler()
     spec.scheduler.runAt = dt

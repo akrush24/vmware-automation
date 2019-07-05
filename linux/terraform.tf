@@ -43,7 +43,6 @@ data "vsphere_network" "network" {
 }
 
 data "vsphere_virtual_machine" "template" {
-  #name          = "ubuntu-16.04"
   name          = "${var.vm_template}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
