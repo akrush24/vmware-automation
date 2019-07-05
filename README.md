@@ -18,6 +18,9 @@ sourse ~/.bashrc
 
 ### PHPIpam ###
 For this stack need PhpIPAM system: https://github.com/phpipam/phpipam
+
+Add ```$api_allow_unsafe = true;``` in config.php in you phpipam system
+
 Example for create Only new IP in PHPIpam system run:
 ```
 ./run.py \
