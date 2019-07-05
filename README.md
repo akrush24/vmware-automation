@@ -1,5 +1,5 @@
 # VMware Automation #
-набор скриптов для упращения развертывания виртуальныз машин в инфраструктуре vsphere
+This are a set of scripts to simplify the deployment of virtual machines in the VMWare vSphere infrastructure from python scrip.
 
 ## INSTALLATION ##
 ```
