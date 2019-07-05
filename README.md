@@ -33,13 +33,38 @@ Example for create Only new IP in PHPIpam system run:
 ### Credentials ###
 Before use create credential file
 ```
-cat >passwd.py<<EOF
+cat >passwd.py<<EOF!
 user_api = '__you_user_name__' # IPAM user
 pass_api = '__pwd__' # IPAM user password
 vc_user  = '__you_user_name__' # vCenter administrator user name
 vc_pass  = '__pwd__' # vCenter administrator user password
-EOF
+EOF!
 ```
+
+### PARAMETERS file ###
+
+```
+cat >parameters.py<<EOF!
+vc_list = [
+    'vcsa01.srv.local',
+    'vcsa02.srv.local',
+    ....
+]
+
+template_linux = [
+    'template_centos',
+    'template_ubuntu'
+    ......
+]
+
+template_wind = [
+    'template_win2008',
+    'template_win2012R2',
+    ......
+]
+
+template_list = template_linux + template_wind
+EOF!
 
 ### HELP ###
 For Help USAGE: 
