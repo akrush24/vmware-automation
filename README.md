@@ -34,10 +34,10 @@ Example for create Only new IP in PHPIpam system run:
 Before use create credential file
 ```
 cat >passwd.py<<EOF
-user_api = '' # IPAM user
-pass_api = '' # IPAM user password
-vc_user  = '' # vCenter administrator user name
-vc_pass  = '' # vCenter administrator user password
+user_api = '__you_user_name__' # IPAM user
+pass_api = '__pwd__' # IPAM user password
+vc_user  = '__you_user_name__' # vCenter administrator user name
+vc_pass  = '__pwd__' # vCenter administrator user password
 EOF
 ```
 
