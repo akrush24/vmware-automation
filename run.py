@@ -12,6 +12,10 @@ version = '0.0.2.1'
 
 parser = argparse.ArgumentParser()
 
+# list of tapameters for choices
+from parameters import template_list, vc_list
+
+
 parser.add_argument('--net', '-l',         dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM")
 parser.add_argument('--vmname', '-n',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]")
 parser.add_argument('--ip', dest='ip',     help='IP Address. If IP exist ip is not taken from IPAM')
@@ -24,11 +28,12 @@ parser.add_argument('--dsize',   '--hdd', '-hdd', dest='dsize',   help='Disk Siz
 parser.add_argument('--msize',   '--mem', '--ram', '-m', dest='mem',   help='RAM Size in GB')
 parser.add_argument('--cpu',     '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc',    '-d', dest='desc',    help='Description')
-parser.add_argument('--template','-t', dest='template',    help='VM Template')
+parser.add_argument('--template','-t', dest='template',    help='VM Template', choices=template_list)
 
 parser.add_argument('--version', '-V', action='version', version='Version: '+version)
 
-parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL')
+
+parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL',choices=vc_list)
 parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store_true')
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "31/01/20"]')
