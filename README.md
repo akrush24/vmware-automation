@@ -65,6 +65,7 @@ template_wind = [
 
 template_list = template_linux + template_wind
 EOF!
+```
 
 ### HELP ###
 For Help USAGE: 
