@@ -15,7 +15,6 @@ variable "vm_disk_size" { default = "50"}
 variable "vm_ip" { default = ""}
 variable "vm_ip_gw" { default = ""}
 variable "vm_netmask" { default = ""}
-#variable "vm_product_key" { default = "D2N9P-3P6X9-2R39C-7RTCD-MDVJX"}
 variable "vm_product_key" { default = "WC2BQ-8NRM3-FDDYY-2BFGV-KHKQY"}
 
 
@@ -93,11 +92,8 @@ resource "vsphere_virtual_machine" "vm" {
         run_once_command_list = [
           "lmgr.vbs /skms 192.168.245.30",
           "slmgr.vbs /ato",
-          "powershell -command (Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).SizeMax)"]                      
+          "powershell -command (Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).SizeMax)"]
         }
-      }
-
-
 
       network_interface {
         ipv4_address = "${var.vm_ip}"
