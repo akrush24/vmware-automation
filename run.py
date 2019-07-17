@@ -6,17 +6,14 @@ import argparse, argcomplete, requests
 from cvm import *
 from passwd import user_api, pass_api, vc_user, vc_pass
 
-from bs4 import BeautifulSoup
-
 today = datetime.date.today()
 
 version = '0.0.3.0'
 
-
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
-from parameters import template_list, vc_list
+from parameters import template_list, vc_list, os_to_template
 
 # parse parameters from our servicedesk (IntraService)
 from servicedesk import get_parameters_vm
@@ -77,13 +74,14 @@ if args.IPRM:
 if args.task is not None:
    if re.match("[1-9][0-9].+", args.task):
       vmparam = get_parameters_vm( str(args.task) )
-      args.vmname = vmparam['hostname']
-      args.cpu = vmparam['cpu']
-      args.hdd = vmparam['hdd']
-      args.exp = vmparam['exp'] 
-      args.ram = vmparam['ram']
+      is args.vmname is None: args.vmname = vmparam['hostname']
+      if args.cpu is None: args.cpu = vmparam['cpu']
+      if args.hdd is None: args.hdd = vmparam['hdd']
+      if args.exp is None: args.exp = vmparam['exp'] 
+      if args.ram is None: args.ram = vmparam['ram']
+      if args.template is None: args.template = os_to_template[vmparam['os']]
       args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + "; O:" + vmparam['owner'] + ";"
-      print ( "TASK: [" + args.task + "]\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram" + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
+      print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram" + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
       # quit() # for debug
 
 if args.vmname is None:

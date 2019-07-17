@@ -27,4 +27,4 @@ def get_parameters_vm(taskid):
     d.update({'owner': soup.find('ul', class_='users').find('a', class_='nounderline').text})
     return d
 
-#print ( get_parameters_vm( "23053" ) )
+#print ( get_parameters_vm( "23091" ) )
