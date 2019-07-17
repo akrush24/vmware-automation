@@ -38,6 +38,9 @@ user_api = '__you_user_name__' # IPAM user
 pass_api = '__pwd__' # IPAM user password
 vc_user  = '__you_user_name__' # vCenter administrator user name
 vc_pass  = '__pwd__' # vCenter administrator user password
+sd_user = '__you_user_name__' # ServiceDesk User
+sd_pass = '__pwd__' # ServiceDesk password
+
 EOF!
 ```
 
