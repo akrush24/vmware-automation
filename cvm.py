@@ -70,7 +70,7 @@ def template(vm_template):
         print ("### TER DIR: ["""+ter_dir+"]")
         return ter_dir
     elif vm_template in template_wind:
-        if vm_template == 'template_win2016EN':
+        if vm_template == 'template_WinSrv2016EN':
             ter_dir = './windows_2016'
         else:
             ter_dir = './windows'

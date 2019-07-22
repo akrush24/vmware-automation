@@ -24,3 +24,9 @@ os_to_template = {
     'Windows - Server 2012' : 'template_WinSrv2012R2EN'}
 
 template_list = template_linux + template_wind
+
+ds = {
+ '15_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter007', 'cl': 'cluster007' },
+ '30_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter01', 'cl': 'cluster001' },
+ '31_localstore_r10' : { 'vc': 'vcsa02.srv.local', 'dc': 'Datacenter02', 'cl': 'cluster02' }
+}

@@ -13,7 +13,7 @@ version = '0.0.3.0'
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
-from parameters import template_list, vc_list, os_to_template
+from parameters import template_list, vc_list, os_to_template, ds
 
 # parse parameters from our servicedesk (IntraService)
 from servicedesk import get_parameters_vm
@@ -81,7 +81,7 @@ if args.task is not None:
       if args.ram is None: args.ram = vmparam['ram']
       if args.template is None: args.template = os_to_template[vmparam['os']]
       args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + "; O:" + vmparam['owner'] + ";"
-      print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram" + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
+      print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
       # quit() # for debug
 
 if args.vmname is None:
@@ -126,19 +126,22 @@ if args.ONLYIP:
 else:
     # check on the fool
     if args.vcenter is None:
-       print("Please enter vCenter Name [--vcenter ...]")
-       quit()
+      if ds[args.ds]['vc']:
+         args.vcenter = ds[args.ds]['vc']
+      else:
+         print("Please enter vCenter Name [--vcenter ...]")
+         quit()
 
     if args.datacenter is None: 
-       if args.vcenter == 'vc-linx.srv.local':
-          args.datacenter = 'Datacenter-Linx'
+       if ds[args.ds]['dc']:
+          args.datacenter = ds[args.ds]['dc']
        else:
           print("Please enter vCenter DataCenter Name [--datacenter ...]")
           quit()
 
     if args.cluster is None:
-       if args.datacenter == 'Datacenter-Linx':
-          args.cluster = 'linx-cluster01'
+       if ds[args.ds]['cl']:
+          args.cluster = ds[args.ds]['cl']
        else:
           print("Please enter vCenter Cluster Name [--cluster ...]")
           quit()
