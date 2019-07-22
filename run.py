@@ -26,7 +26,7 @@ parser.add_argument('--folder',           dest='folder',  help='VM Folder in vCe
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
 parser.add_argument('--cluster',   '-cl', dest='cluster',  help='vSphere Cluster')
 
-parser.add_argument('--dsize',   '--hdd', '-hdd', dest='dsize',   help='Disk Size')
+parser.add_argument('--hdd',   '--hdd', '-hdd', dest='hdd',   help='Disk Size')
 parser.add_argument('--ram', dest='ram',   help='RAM Size in GB')
 parser.add_argument('--cpu',     '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc',    '-d', dest='desc',    help='Description')
@@ -74,7 +74,7 @@ if args.IPRM:
 if args.task is not None:
    if re.match("[1-9][0-9].+", args.task):
       vmparam = get_parameters_vm( str(args.task) )
-      is args.vmname is None: args.vmname = vmparam['hostname']
+      if args.vmname is None: args.vmname = vmparam['hostname']
       if args.cpu is None: args.cpu = vmparam['cpu']
       if args.hdd is None: args.hdd = vmparam['hdd']
       if args.exp is None: args.exp = vmparam['exp'] 
@@ -156,12 +156,12 @@ else:
     if args.ram is not None: args.ram = str(int(args.ram)*1024) # convert GB to MB
     if args.cpu   is None: args.cpu = 2
     if args.ram   is None: args.ram = 2048
-    if args.dsize is None: args.dsize = 50
-    print('### [MEM: '+str(args.ram)+"], [HDD: "+str(args.dsize)+"], [CPU: "+str(args.cpu)+"]")
+    if args.hdd is None: args.hdd = 50
+    print('### [MEM: '+str(args.ram)+"], [HDD: "+str(args.hdd)+"], [CPU: "+str(args.cpu)+"]")
 
     try:
        ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.ram,
-                 vm_disk_size=args.dsize, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
+                 vm_disk_size=args.hdd, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
     except:
        print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
        quit()
