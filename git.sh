@@ -5,5 +5,5 @@ then
 else
   comment="`date`"
 fi
-
+git add -A
 git commit -a -m "$comment" && git push
