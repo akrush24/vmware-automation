@@ -10,7 +10,6 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 from tools import tasks
 from tools import tasks
-#from tools import cli
 
 import datetime
 
