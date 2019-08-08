@@ -196,7 +196,8 @@ else:
        print("!!! You did not enter the VM lifetime. PASS.")
 
 
-    if args.RESIZE: # resize HDD
+    #if args.RESIZE and re.match(r'linux', template(vm_template)): # resize HDD
+    if re.match(r'linux', template(args.template)): # resize HDD
        #answ = input('Run disk resize on '+ ip +' [Y/N]?')
        #if answ == 'Y':
        call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
