@@ -128,6 +128,7 @@ else:
     if args.vcenter is None:
       if ds[args.ds]['vc']:
          args.vcenter = ds[args.ds]['vc']
+         print ( "--vcenter " + ds[args.ds]['vc'] )
       else:
          print("Please enter vCenter Name [--vcenter ...]")
          quit()
@@ -135,6 +136,7 @@ else:
     if args.datacenter is None: 
        if ds[args.ds]['dc']:
           args.datacenter = ds[args.ds]['dc']
+          print ( "--datacenter " + ds[args.ds]['dc'] )
        else:
           print("Please enter vCenter DataCenter Name [--datacenter ...]")
           quit()
@@ -142,6 +144,7 @@ else:
     if args.cluster is None:
        if ds[args.ds]['cl']:
           args.cluster = ds[args.ds]['cl']
+          print ( "--cluster " + ds[args.ds]['cl'] )
        else:
           print("Please enter vCenter Cluster Name [--cluster ...]")
           quit()
