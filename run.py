@@ -19,7 +19,7 @@ from parameters import template_list, vc_list, os_to_template, ds
 from servicedesk import get_parameters_vm
 
 parser.add_argument('--net', '-l',         dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM")
-parser.add_argument('--vmname', '-n',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]")
+parser.add_argument('--vmname', '-n', '--name',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]")
 parser.add_argument('--ip', dest='ip',     help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--datastor', '-ds',   dest='ds',      help="Datastore name")
 parser.add_argument('--folder',           dest='folder',  help='VM Folder in vCenter [EXMPLE: folder1/folder2]')
@@ -197,7 +197,7 @@ else:
 
 
     #if args.RESIZE and re.match(r'linux', template(vm_template)): # resize HDD
-    if re.match(r'linux', args.template): # resize HDD
+    if re.search(r'centos', args.template.lower()) or re.search(r'ubuntu', args.template.lower()) or re.search(r'lin', args.template.lower() ): # resize HDD
        #answ = input('Run disk resize on '+ ip +' [Y/N]?')
        #if answ == 'Y':
        call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
