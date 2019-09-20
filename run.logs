@@ -1,2 +1,7 @@
 [2019-09-20 11:36:16.021173]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 
 [2019-09-20 11:40:07.823005]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 
+[2019-09-20 11:45:49.132405]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25615 
+[2019-09-20 11:46:46.265108]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25615 
+[2019-09-20 11:54:16.257400]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 --ram 6 
+[2019-09-20 12:06:15.583884]: ./run.py -IP --net 192.168.221.0/24 
+[2019-09-20 12:07:06.568526]: ./run.py -IP --net 192.168.221.0/24 --vmname gf-ora-01.dev 
