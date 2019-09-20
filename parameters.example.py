@@ -30,3 +30,12 @@ ds = {
  '30_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter01', 'cl': 'cluster001' },
  '31_localstore_r10' : { 'vc': 'vcsa02.srv.local', 'dc': 'Datacenter02', 'cl': 'cluster02' }
 }
+
+port_int = {
+# CIDR             : PORT GROUP NAME
+ '192.168.222.0/24': '192.168.222',
+ '192.168.199.0/24': '192.168.199',
+ '192.168.245.0/24': '192.168.245',
+ '192.168.238.0/24': '192.168.238',
+ '192.168.221.0/24': '192.168.221'
+}

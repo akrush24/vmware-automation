@@ -13,12 +13,12 @@ version = '0.0.3.0'
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
-from parameters import template_list, vc_list, os_to_template, ds
+from parameters import template_list, vc_list, os_to_template, ds, port_int
 
 # parse parameters from our servicedesk (IntraService)
 from servicedesk import get_parameters_vm
 
-parser.add_argument('--net', '-l',         dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM")
+parser.add_argument('--net', '-l',         dest='net',     help="Network [EXAMPLE: --net 192.168.0.0/24]. Auto assign IP addres from IPAM", choices=port_int)
 parser.add_argument('--vmname', '-n', '--name',      dest='vmname',  help="VM name [EXAMPLE: --vmname vm-01]")
 parser.add_argument('--ip', dest='ip',     help='IP Address. If IP exist ip is not taken from IPAM')
 parser.add_argument('--datastor', '-ds',   dest='ds',      help="Datastore name", choices=ds)
@@ -119,10 +119,11 @@ if args.NODES:
       quit()
 
 if args.ONLYIP:
-    print("Only reserv IP for vm :"+args.vmname)
+    print("Only reserv IP for vm : "+args.vmname)
     if args.desc is None:
        args.desc = args.vmname
-       ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
+    print ("vname: "+args.vmname + "; desc: "+args.desc)
+    ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
 else:
     # check on the fool
     if args.vcenter is None:
