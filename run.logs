@@ -1,0 +1,2 @@
+[2019-09-20 11:36:16.021173]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 
+[2019-09-20 11:40:07.823005]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 

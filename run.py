@@ -13,7 +13,7 @@ version = '0.0.3.0'
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
-from parameters import template_list, vc_list, os_to_template, ds, port_int
+from parameters import template_list, vc_list, os_to_template, ds, port_int, net_default
 
 # parse parameters from our servicedesk (IntraService)
 from servicedesk import get_parameters_vm
@@ -49,6 +49,21 @@ parser.add_argument('--task',  dest='task', help='Get parameters from ServiceDes
 
 argcomplete.autocomplete(parser)
 args = parser.parse_args()
+
+#
+# wrile log statistics
+#
+argslog = ""
+now = datetime.datetime.utcnow()
+for arglog in sys.argv:
+   argslog = argslog + str(arglog) + " "
+logfile=open("run.logs", "a")
+argslog = argslog + "\n"
+log = "[" + str(now) + "]: " + argslog
+print(log)
+logfile.write(log)
+logfile.close()
+######################
 
 #if args.folder is None and args.onlyip is not 'yes':
 #    print("Please enter Folder name");
@@ -155,7 +170,9 @@ else:
        quit()
 
     if args.net is None:
-       print("Please enter NETwork [--net ...]")
+       args.net = net_default;
+       print( "--net " + args.net )
+       #print("Please enter NETwork [--net ...]")
 
     if args.desc is None:
        print("Please enter Description [--desc ...]")
