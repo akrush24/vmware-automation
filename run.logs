@@ -1,0 +1,23 @@
+[2019-09-20 11:36:16.021173]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 
+[2019-09-20 11:40:07.823005]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 
+[2019-09-20 11:45:49.132405]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25615 
+[2019-09-20 11:46:46.265108]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25615 
+[2019-09-20 11:54:16.257400]: ./run.py --datastor 31_localstore_r10 --folder ERP/ --task 25614 --ram 6 
+[2019-09-20 12:06:15.583884]: ./run.py -IP --net 192.168.221.0/24 
+[2019-09-20 12:07:06.568526]: ./run.py -IP --net 192.168.221.0/24 --vmname gf-ora-01.dev 
+[2019-09-24 07:32:27.470657]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25693 
+[2019-09-24 11:08:16.479958]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md001 
+[2019-09-24 11:12:00.772154]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md002 
+[2019-09-24 11:12:22.091621]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md003 
+[2019-09-24 11:12:28.190615]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md004 
+[2019-09-24 11:12:34.701108]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md005 
+[2019-09-24 11:12:40.755147]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md006 
+[2019-09-24 11:18:42.159407]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md002 
+[2019-09-24 11:22:34.822253]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md003 
+[2019-09-24 11:26:44.787146]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md004 
+[2019-09-24 11:30:05.335277]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md005 
+[2019-09-24 11:33:25.951600]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25746 --name at-md006 
+[2019-09-24 11:41:01.201849]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25689 --cpu 8 --ram 8 --name erno-db-01 
+[2019-09-24 11:48:02.845972]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25689 --cpu 4 --ram 8 --name erno-elk-01 --hdd 150 
+[2019-09-24 11:59:44.694872]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25689 --cpu 2 --ram 2 --name erno-fs-01 --hdd 300 
+[2019-09-24 12:13:57.041928]: ./run.py --datastor 31_localstore_r10 --folder INV/ --task 25689 --cpu 2 --ram 2 --name erno-kube-01 --hdd 40 
