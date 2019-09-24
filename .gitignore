@@ -1,9 +1,9 @@
 passwd.py
 parameters.py
+run.logs
 __pycache__
 .idea
 */terraform.tfstate
 */.terraform
 example
 */*.lock.info
-./run.logs
