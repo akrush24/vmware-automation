@@ -39,8 +39,9 @@ parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "31/01/20"]')
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
-parser.add_argument('-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
-parser.add_argument('--EXPIRE' , '-E', dest='EXPIRE', help='Set only expire [EXMPLE --EXPIRE]',      action='store_true')
+parser.add_argument('--iprm', '-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
+parser.add_argument('--expire' , '-E', dest='EXPIRE', help='ONLY Set expire to vm: --name',      action='store_true')
+parser.add_argument('--move' , '-M', dest='MOVE', help='ONLY move vm: --name to folder: --folder',      action='store_true')
 parser.add_argument('-N', dest='NODES', help='Edit Nodes only', action='store_true')
 parser.add_argument('--resize', '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
 parser.add_argument('--task',  dest='task', help='Get parameters from ServiceDesk task (ram,hdd,cpu)')
@@ -64,6 +65,10 @@ print(log)
 logfile.write(log)
 logfile.close()
 ######################
+
+def bye():
+   print ("Good Bye....")
+   quit()
 
 #if args.folder is None and args.onlyip is not 'yes':
 #    print("Please enter Folder name");
@@ -101,13 +106,15 @@ if args.task is not None:
 
 # отпеделяем vCenter сервер
 if args.vcenter is None:
+    if args.ds is None:
+        print ("Please enter --datastor")
+        bye()
     if ds[args.ds]['vc']:
         args.vcenter = ds[args.ds]['vc']
         print ( "--vcenter " + ds[args.ds]['vc'] )
     else:
         print("Please enter vCenter Name [--vcenter ...]")
-    quit()
-
+        bye()
 
 if args.vmname is None:
     print("Please enter --vmname: vmname")
@@ -149,6 +156,16 @@ if args.NODES:
    except:
       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
       quit()
+
+if args.MOVE:
+    print ("### Move VM to: ["+args.folder+"]")
+    try:
+       move_vm_to_folder(args.vcenter, args.ip, args.folder, args.cluster)
+    except:
+       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
+    bye()
+    #quit();
+
 
 if args.ONLYIP:
     print("Only reserv IP for vm : "+args.vmname)
@@ -216,10 +233,10 @@ else:
 
     print ("### Move VM to: ["+args.folder+"]")
     try:
-       move_vm_to_folder(args.vcenter, vc_user, vc_pass, ip, args.folder, args.cluster)
+       move_vm_to_folder(args.vcenter, ip, args.folder, args.cluster)
     except:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
-       quit()
+       #quit()
 
 
     if args.exp is not None:
@@ -229,7 +246,7 @@ else:
           scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
        except:
           print ("!!! ERROR: scheduledTask_poweroff: ", sys.exc_info())
-          quit()
+          #quit()
     else:
        print("!!! You did not enter the VM lifetime. PASS.")
 

@@ -96,7 +96,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     vm_ip_gw = re.sub('[/]', '', cidr)[:-3] + '1'  # get GW (example 192.168.222.1)
     vm_netmask = cidr[-2:]   # get prefix netmask (example /24)вд
 #get port_group_vm_interface  (return portgroup)
-    def portgroup(cidr):
+#    def portgroup(cidr):
 #        port_int = {'192.168.222.0/24': '192.168.222',
 #                    '192.168.199.0/24': '192.168.199',
 #                    '192.168.245.0/24': '192.168.245',
@@ -112,50 +112,50 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
 #                    '192.168.221.0/24': '192.168.221'
 #}
 
-        if port_int[cidr]:
-            vm_portgroup = port_int.get(cidr)
-            print ("### PortGroup is "+vm_portgroup)
-            return vm_portgroup
-        else:
-            print ('!!! No network portgroup!')
+    if port_int[cidr]:
+        vm_portgroup = port_int.get(cidr)
+        print ("### PortGroup is: " + vm_portgroup)
+    else:
+        print ('!!! No network portgroup!')
 
+    tf = Terraform(working_dir=ter_dir, variables={ 'vc_host': vc_host,
+                                                    'vc_user': vc_user, 'vc_pass': vc_pass,
+                                                    'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
+                                                    'vm_portgroup': vm_portgroup, 'vm_template': vm_template,
+                                                    'vm_hostname': hostname, 'vm_cpu': vm_cpu, 'vm_ram': vm_ram,
+                                                    'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
+                                                    'vm_netmask': vm_netmask} )
 
-    vm_portgroup = portgroup(cidr)
-    tf = Terraform(working_dir=ter_dir, variables={'vc_host': vc_host,
-                                                   'vc_user': vc_user, 'vc_pass': vc_pass,
-                                                   'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
-                                                   'vm_portgroup': vm_portgroup, 'vm_template': vm_template,
-                                                   'vm_hostname': hostname, 'vm_cpu': vm_cpu, 'vm_ram': vm_ram,
-                                                   'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
-                                                   'vm_netmask': vm_netmask})
-    #kwargs = {"auto-approve": True}
+    approve = {"auto-approve":True}
 
     try:
+       print ("Teraform Init....")
        if debug: # is debug mode print all output
-          print(tf.init())
+          print( tf.init(reconfigure=True) )
        else:
-          tf.init()
+          tf.init(reconfigure=True)
     except:
        print ("!!! ERROR in create_vm_terraform(tf.init()): ",sys.exc_info())
        quit()
 
     try:
+       print ("Teraform Plan....")
        if debug: # is debug mode print all output
-          print(tf.plan(no_color=IsFlagged, refresh=False, capture_output=True))
+          print( tf.plan(no_color=IsFlagged, refresh=False, capture_output=False) )
        else:
-          tf.plan(no_color=IsFlagged, refresh=False, capture_output=True)
+          tf.plan( no_color=IsFlagged, refresh=False, capture_output=True )
     except:
-       print ("!!! ERROR in create_vm_terraform(tf.plan()): ",sys.exc_info())
+       print ("!!! ERROR in create_vm_terraform(tf.plan()): ", sys.exc_info())
        quit()
 
-    approve = {"auto-approve": True}
     try:
+       print ("Teraform Apply....")
        if debug: # is debug mode print all output
-          print(tf.apply(**approve))
+          print( tf.apply(auto_approve=True) )
        else:
-          tf.apply(**approve)
+          tf.apply(auto_approve=True)
     except:
-       print ("!!! ERROR in create_vm_terraform(tf.apply()): ",sys.exc_info())
+       print ("!!! ERROR in create_vm_terraform(tf.apply()): ", sys.exc_info())
        quit()
 
 
@@ -183,7 +183,7 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
     task = vm.ReconfigVM_Task(spec)
 
 
-def move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm, cluster):
+def move_vm_to_folder(vc_host, ip, folder_vm, cluster):
 
     #default folders path
     folder_dc_pass = { 'vc-linx.srv.local':'Datacenter-Linx/vm/', 'vcsa.srv.local':'PHX/vm/', 'vc-khut.srv.local':'ATK/vm/' }
