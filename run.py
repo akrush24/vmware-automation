@@ -99,9 +99,26 @@ if args.task is not None:
       print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
       # quit() # for debug
 
+# отпеделяем vCenter сервер
+if args.vcenter is None:
+    if ds[args.ds]['vc']:
+        args.vcenter = ds[args.ds]['vc']
+        print ( "--vcenter " + ds[args.ds]['vc'] )
+    else:
+        print("Please enter vCenter Name [--vcenter ...]")
+    quit()
+
+
 if args.vmname is None:
     print("Please enter --vmname: vmname")
     quit()
+else:
+    # убираем недопустимые символы из имени машины
+    oldname = args.vmname
+    args.vmname = args.vmname.replace(".","-")
+    args.vmname = args.vmname.replace("_","-")
+    if oldname != args.vmname:
+       print ("!!! YOU VM Name IS CHANGED FROM: " + oldname + " =TO=>: " + args.vmname)
 
 if args.exp is None:
     exp = today + datetime.timedelta(days = 356)
