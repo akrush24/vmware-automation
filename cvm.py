@@ -90,27 +90,10 @@ def template(vm_template):
         quit()
 
 
-#varible5
 def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size, debug ):
     vm_ip_gw = re.sub('[/]', '', cidr)[:-3] + '1'  # get GW (example 192.168.222.1)
     vm_netmask = cidr[-2:]   # get prefix netmask (example /24)вд
-#get port_group_vm_interface  (return portgroup)
-#    def portgroup(cidr):
-#        port_int = {'192.168.222.0/24': '192.168.222',
-#                    '192.168.199.0/24': '192.168.199',
-#                    '192.168.245.0/24': '192.168.245',
-#                    '192.168.238.0/24': '192.168.238',
-#                    '192.168.189.0/24': '192.168.189_uni',
-#                    '192.168.231.0/24': '231_VMNetwork',
-#                    '192.168.14.0/23' : 'VLAN14',
-#                    '172.20.20.0/24'  : '172.20.20.0',
-#                    '172.25.16.0/24'  : '172.25.16.0',
-#                    '192.168.24.0/24' : 'VLAN_24', # ATC vcenter.at-consulting.ru
-#                    '192.168.9.0/24'  : 'VLAN09', # ATC vcenter.at-consulting.ru
-#                    '192.168.194.0/24': 'ds-VLAN_194', # ATC vcenter.at-consulting.ru
-#                    '192.168.221.0/24': '192.168.221'
-#}
 
     if port_int[cidr]:
         vm_portgroup = port_int.get(cidr)
@@ -118,6 +101,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     else:
         print ('!!! No network portgroup!')
 
+    print("IP: " + ip)
     tf = Terraform(working_dir=ter_dir, variables={ 'vc_host': vc_host,
                                                     'vc_user': vc_user, 'vc_pass': vc_pass,
                                                     'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
@@ -131,9 +115,9 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     try:
        print ("Teraform Init....")
        if debug: # is debug mode print all output
-          print( tf.init(reconfigure=True) )
+          print( tf.init() )
        else:
-          tf.init(reconfigure=True)
+          tf.init()
     except:
        print ("!!! ERROR in create_vm_terraform(tf.init()): ",sys.exc_info())
        quit()

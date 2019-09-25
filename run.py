@@ -35,7 +35,7 @@ parser.add_argument('--template','-t', dest='template',    help='VM Template', c
 parser.add_argument('--version', '-V', action='version', version='Version: '+version)
 
 parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL',choices=vc_list)
-parser.add_argument('--debug',   dest='debug',  help='debug mode', action='store_true')
+parser.add_argument('--debug', '-D',   dest='debug',  help='debug mode', action='store_true')
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "31/01/20"]')
 parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
