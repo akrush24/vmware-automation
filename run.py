@@ -13,7 +13,7 @@ version = '0.0.3.0'
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
-from parameters import template_list, vc_list, os_to_template, ds, port_int, net_default
+from parameters import template_list, vc_list, os_to_template, ds, port_int, net_default, stor_default
 
 # parse parameters from our servicedesk (IntraService)
 from servicedesk import get_parameters_vm
@@ -82,13 +82,13 @@ def bye():
 if args.IPRM:
    if args.ip is None:
       print("!!! Please enter IP")
-      quit()
+      bye()
    if args.net is None:
       print("!!! Please enter --net (ex: --net 192.168.0.0/24)")
-      quit()
+      bye()
    else:
       ipam_rm_ip(args.ip, args.net)
-      quit()
+      bye()
 
 # выстаскиваем значения из заявки
 if args.task is not None:
@@ -107,8 +107,13 @@ if args.task is not None:
 # отпеделяем vCenter сервер
 if args.vcenter is None:
     if args.ds is None:
-        print ("Please enter --datastor")
-        bye()
+        
+        if stor_default is None:
+           print ("Please enter --datastor")
+           bye()
+        else:
+           args.ds = stor_default
+           print("#!#! Default DataStore is: " + stor_default)
     if ds[args.ds]['vc']:
         args.vcenter = ds[args.ds]['vc']
         print ( "--vcenter " + ds[args.ds]['vc'] )
