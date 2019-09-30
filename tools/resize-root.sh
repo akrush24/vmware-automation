@@ -9,7 +9,11 @@ GROWPART=$(which growpart)
 
 if [ $? -ne 0 ]; then
   echo "growpart command is missing"
-  exit 1
+  if [ -f /etc/debian_version ]; then
+    apt-get install -y cloud-guest-utils
+  else
+    yum install -y cloud-utils-growpart
+  fi
 fi
 
 if [ $(df | grep ' /$' | wc -l) -eq 0 ]; then
