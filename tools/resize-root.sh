@@ -12,12 +12,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-if [ $(grep mapper /etc/fstab |grep ' / ' |wc -l) -eq 0 ]; then
+if [ $(df | grep ' /$' | wc -l) -eq 0 ]; then
   DEVICE=$(readlink -f "$DEVICE")
   DISK=$(echo "$DEVICE" | sed 's/.$//')
   PARTITION=$(echo "$DEVICE" | sed "s|^$DISK||")
   LVM="no"
 fi
+
+echo $LVM
 
 if [ "${LVM}" != "no" ]; then
   if [ -f /etc/debian_version ]; then
@@ -37,12 +39,11 @@ if [ "${LVM}" != "no" ]; then
   fi
 fi
 
-if [ -n "$DEBUG" ]; then
-  echo DEVICE: ${DEVICE}
-  echo FSTYPE: ${FSTYPE}
-  echo DISK: ${DISK}
-  echo PARTITION: ${PARTITION}
-fi
+echo DEVICE: ${DEVICE}
+echo FSTYPE: ${FSTYPE}
+echo DISK: ${DISK}
+echo PARTITION: ${PARTITION}
+
 
 (
   for PART in ${PARTITION}; do
@@ -67,3 +68,4 @@ case "${FSTYPE}" in
     ;;
 esac
 
+df -h /

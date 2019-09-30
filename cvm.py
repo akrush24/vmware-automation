@@ -13,8 +13,6 @@ from tools import tasks
 
 import datetime
 
-from subprocess import call
-
 # import paramaners list
 from parameters import template_list, template_linux, template_wind, port_int
 
@@ -89,6 +87,10 @@ def template(vm_template):
            i=i+1
         quit()
 
+## функция пробегает по всем элементам массива и выводит их на экран
+def print_array(arr):
+    for a in arr:
+       print( str(a) )
 
 def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size, debug ):
@@ -110,37 +112,49 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
                                                     'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
                                                     'vm_netmask': vm_netmask} )
 
+
+    print ("\nTeraform Init....")
+    out_tinit = tf.init()
+    if debug:
+       print_array(out_tinit)
+
+    print ("\nTeraform Plan....")
+    out_tplan = tf.plan()
+    if debug: 
+       print_array(out_tplan)
+
+
+    #try:
+    #   #out = tf.plan(no_color=IsFlagged, refresh=False)
+    #   if debug: # is debug mode print all output
+    #      print( str(out[2]) )
+    #      print( str(out[3]) )
+    #   #else:
+    #   #   tf.plan( no_color=IsFlagged, refresh=False, capture_output=True )
+    #except:
+    #   print ("!!! ERROR in create_vm_terraform(tf.plan()): ", sys.exc_info())
+    #   bye()
+
+    print ("\nTeraform Apply....")
     approve = {"auto-approve":True}
-
-    try:
-       print ("Teraform Init....")
-       if debug: # is debug mode print all output
-          print( tf.init() )
-       else:
-          tf.init()
-    except:
-       print ("!!! ERROR in create_vm_terraform(tf.init()): ",sys.exc_info())
+    out_tapply = tf.apply(auto_approve=True)
+    if debug:
+       print_array(out_tapply)
+    err = str(out_tapply).find("Error")
+    print( "ERRORs: "+str(err) )
+    if err > 0: # если в выводе teraform apply есть слово Error то пишем ошибку и выходим.
+       print("create_vm_terraform: Error applying plan")
+       print_array(out_tapply)
        quit()
 
-    try:
-       print ("Teraform Plan....")
-       if debug: # is debug mode print all output
-          print( tf.plan(no_color=IsFlagged, refresh=False, capture_output=False) )
-       else:
-          tf.plan( no_color=IsFlagged, refresh=False, capture_output=True )
-    except:
-       print ("!!! ERROR in create_vm_terraform(tf.plan()): ", sys.exc_info())
-       quit()
-
-    try:
-       print ("Teraform Apply....")
-       if debug: # is debug mode print all output
-          print( tf.apply(auto_approve=True) )
-       else:
-          tf.apply(auto_approve=True)
-    except:
-       print ("!!! ERROR in create_vm_terraform(tf.apply()): ", sys.exc_info())
-       quit()
+    #try:
+    #   if debug: # is debug mode print all output
+    #      print( tf.apply(auto_approve=True, capture_output=True) )
+    #   else:
+    #      tf.apply(auto_approve=True)
+    #except:
+    #   print ("!!! ERROR in create_vm_terraform(tf.apply()): ", sys.exc_info())
+    #   bye()
 
 
     # remove teraform state file
@@ -205,12 +219,7 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     else:
        print ("### YOUR IP is: ["+ip+"]")
 
-    try:
-       create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
-       print ("### VM is Ready: ["+hostname+" : "+ip+"]")
-    except:
-       print ("!!! ERROR in create_vm_terraform: ",sys.exc_info())
-       quit()
+    create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
 
 #    try:
 #       notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)

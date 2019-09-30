@@ -1,8 +1,7 @@
 #!/usr/bin/env python3.4
 
-import sys, datetime
+import sys, datetime, os
 import argparse, argcomplete, requests
-#from ipam_create_ip import ipam_create_ip
 from cvm import *
 from passwd import user_api, pass_api, vc_user, vc_pass
 
@@ -78,6 +77,9 @@ def bye():
 #    print("Please enter VM Template");
 #    quit()
 
+if args.debug:
+   print("* * * You enter in Debug mode * * *\n")
+
 # удаляем указанный адрес, --ip <IPADDR>
 if args.IPRM:
    if args.ip is None:
@@ -113,7 +115,8 @@ if args.vcenter is None:
            bye()
         else:
            args.ds = stor_default
-           print("#!#! Default DataStore is: " + stor_default)
+           print("--datastor is not set, default DataStore is: " + stor_default)
+
     if ds[args.ds]['vc']:
         args.vcenter = ds[args.ds]['vc']
         print ( "--vcenter " + ds[args.ds]['vc'] )
@@ -170,7 +173,6 @@ if args.MOVE:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
     bye()
     #quit();
-
 
 if args.ONLYIP:
     print("Only reserv IP for vm : "+args.vmname)
@@ -260,4 +262,4 @@ else:
     if re.search(r'centos', args.template.lower()) or re.search(r'ubuntu', args.template.lower()) or re.search(r'lin', args.template.lower() ): # resize HDD
        #answ = input('Run disk resize on '+ ip +' [Y/N]?')
        #if answ == 'Y':
-       call(["./vms_prepare/grow_root.sh", ip, "root", "-s"])
+       os.system('ssh root@'+ip+'" bash -s" < ./tools/resize-root.sh')
