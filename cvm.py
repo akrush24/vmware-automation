@@ -9,7 +9,6 @@ from pyVim import connect
 from pyVmomi import vmodl
 from pyVmomi import vim
 from tools import tasks
-from tools import tasks
 
 import datetime
 
@@ -182,6 +181,13 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
 
 
 def move_vm_to_folder(vc_host, ip, folder_vm, cluster):
+    
+    if ip is None:
+       print("!!! Please enter --ip xxx.xxx.xxx.xxx")
+       quit()
+    if folder_vm is None:
+       print("!!! Please enter --folder Name")
+       quit()
 
     #default folders path
     folder_dc_pass = { 'vc-linx.srv.local':'Datacenter-Linx/vm/', 'vcsa.srv.local':'PHX/vm/', 'vc-khut.srv.local':'ATK/vm/' }
@@ -192,15 +198,21 @@ def move_vm_to_folder(vc_host, ip, folder_vm, cluster):
 
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
-    config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
-    uuid = config_uuid.summary.config.instanceUuid
-    vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
-    spec = vim.vm.ConfigSpec()
-    task = vm.ReconfigVM_Task(spec)
-    tasks.wait_for_tasks(service_instance, [task])
+    #config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
+    vm = service_instance.content.searchIndex.FindByIp(None, ip, True)
+    #uuid = config_uuid.summary.config.instanceUuid
+    #vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
+    #spec = vim.vm.ConfigSpec()
+    #task = vm.ReconfigVM_Task(spec)
+    #tasks.wait_for_tasks(service_instance, [task])
     folder = service_instance.content.searchIndex.FindByInventoryPath(folder_dc+folder_vm)
-    print(folder_vm)
-    folder.MoveIntoFolder_Task([config_uuid])
+    if folder != None:
+       print ("Folder: "+folder_dc+folder_vm+" Exist.")
+       folder.MoveIntoFolder_Task([vm])
+    else:
+       print("!!! Folder: "+folder_dc+folder_vm+" is not Exist.")
+       #print("Create folder: "+folder_vm)
+       
 
 
 def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug, expire_vm_date):

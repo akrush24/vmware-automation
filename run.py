@@ -60,7 +60,7 @@ for arglog in sys.argv:
 logfile=open("run.logs", "a")
 argslog = argslog + "\n"
 log = "[" + str(now) + "]: " + argslog
-print(log)
+print("\n"+log)
 logfile.write(log)
 logfile.close()
 ######################
