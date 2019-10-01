@@ -10,6 +10,8 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 from tools import tasks
 
+#from parameters import template_list, vc_list, os_to_template, ds, port_int, net_default, stor_default
+
 import datetime
 
 # import paramaners list
@@ -174,13 +176,13 @@ def notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname, expired):
     if expired is not None:
        message = message + ", exp: " + expired
     vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
-    print("Found: {0}".format(vm.name))
+    print("Found vm: {0}".format(vm.name))
     spec = vim.vm.ConfigSpec()
     spec.annotation = message
     task = vm.ReconfigVM_Task(spec)
 
 
-def move_vm_to_folder(vc_host, ip, folder_vm, cluster):
+def move_vm_to_folder(vc_host, ip, folder_vm, cluster, dc):
     
     if ip is None:
        print("!!! Please enter --ip xxx.xxx.xxx.xxx")
@@ -198,20 +200,27 @@ def move_vm_to_folder(vc_host, ip, folder_vm, cluster):
 
     folder_dc = folder_dc_pass.get(vc_host)
     service_instance = connect.SmartConnectNoSSL(host=vc_host, user=vc_user, pwd=vc_pass, port=443)
-    #config_uuid = service_instance.content.searchIndex.FindByIp(None, ip, True)
     vm = service_instance.content.searchIndex.FindByIp(None, ip, True)
-    #uuid = config_uuid.summary.config.instanceUuid
-    #vm = service_instance.content.searchIndex.FindByUuid(None, uuid, True, True)
-    #spec = vim.vm.ConfigSpec()
-    #task = vm.ReconfigVM_Task(spec)
-    #tasks.wait_for_tasks(service_instance, [task])
-    folder = service_instance.content.searchIndex.FindByInventoryPath(folder_dc+folder_vm)
+    if vm == None:
+       print("!!! VM: ["+ ip + "] IS NOT EXIST!")
+       quit()
+    folder = service_instance.content.searchIndex.FindByInventoryPath(folder_dc + folder_vm)
+    print( "Folder: "+str(folder) )
     if folder != None:
-       print ("Folder: "+folder_dc+folder_vm+" Exist.")
+       print ("Folder: "+str(folder_dc+folder_vm)+" Exist.")
        folder.MoveIntoFolder_Task([vm])
     else:
-       print("!!! Folder: "+folder_dc+folder_vm+" is not Exist.")
-       #print("Create folder: "+folder_vm)
+       print("!!! Folder: " +folder_dc+folder_vm+ " is not Exist.")
+       print("Create folder: " + folder_vm)
+       os.system('./tools/create_folder_in_datacenter.py -s "'+vc_host+'" -u "'+vc_user+'" -p "'+vc_pass+'" -d "'+ dc  +'" -f "'+folder_vm+'"')
+       print("Check folder")
+       folder = service_instance.content.searchIndex.FindByInventoryPath(folder_dc + folder_vm)
+       if folder != None:
+          print("Move vm "+ str(vm) +" to folder: "+folder_vm)
+          folder.MoveIntoFolder_Task([vm])
+       else:
+          print("!!! Failed to create folder: " + folder_dc + folder_vm)
+          quit()
        
 
 
@@ -233,27 +242,7 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
 
     create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
 
-#    try:
-#       notes_write_vm(vc_host, vc_user, vc_pass, ip, infraname)
-#       print ("### Edit nodes to: ["+infraname+"]")
-#    except:
-#       print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
-
-#    try:
-#       move_vm_to_folder(vc_host, vc_user, vc_pass, ip, folder_vm)
-#       print ("### Move VM to: ["+folder_vm+"]")
-#    except:
-#       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
-
     return ip
-
-#    if expire_vm_date is not None:
-#       scheduledTask_poweroff(hostname=hostname, expire_vm_date=expire_vm_date, vc_host=vc_host)
-
-# main (hostname='host889', infraname='INFRA8888', cidr='192.168.222.0/24', vc_host='vc-linx.srv.local',
-#       vc_user='', vc_pass='', vc_dc='Datacenter-Linx', vc_cluster='linx-cluster01',
-# vc_storage='27_localstore_r10', vm_template='template_centos7.3', vm_cpu='1', vm_ram='2048', vm_disk_size='30',
-#       folder_vm = 'test')
 
 
 #exemple expire_vm_date  'DD/MM/YY'

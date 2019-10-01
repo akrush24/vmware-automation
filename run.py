@@ -124,6 +124,38 @@ if args.vcenter is None:
         print("Please enter vCenter Name [--vcenter ...]")
         bye()
 
+# время жизни машины, нужно для установки Shedudet Tasks
+if args.exp is None:
+    exp = today + datetime.timedelta(days = 356)
+    args.exp = exp.strftime('%d')+"."+exp.strftime('%m')+"."+exp.strftime('%Y')
+    print ("Expire set to: " + args.exp)
+
+# только устанавливаем выключение машины па доте указанной в --exp и выходим
+if args.EXPIRE:
+    print("Set Expire for vm: "+args.vmname)
+    if args.exp is not None:
+       scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
+    else:
+       print("!!! --exp is not to be None")
+    bye()
+
+if args.NODES:
+   print("Only Edit Nodes for vm: "+args.vmname+" Ok....")
+   if args.desc is None:
+      print("!!! Please enter Dscriptin")
+      bye()
+   if args.ip is None:
+      print("!!! Please enter IP")
+      bye()
+   else:
+      ip=args.ip
+   try:
+      print (notes_write_vm(args.vcenter, vc_user, vc_pass, ip, args.desc, args.exp))
+      bye()
+   except:
+      print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
+      bye()
+
 if args.vmname is None:
     print("Please enter --vmname: vmname")
     quit()
@@ -135,51 +167,31 @@ else:
     if oldname != args.vmname:
        print ("!!! YOU VM Name IS CHANGED FROM: " + oldname + " =TO=>: " + args.vmname)
 
-if args.exp is None:
-    exp = today + datetime.timedelta(days = 356)
-    args.exp = exp.strftime('%d')+"."+exp.strftime('%m')+"."+exp.strftime('%Y')
-    print (args.exp)
-
-if args.EXPIRE:
-    print("Set Expire for vm: "+args.vmname)
-    if args.exp is not None:
-       scheduledTask_poweroff(hostname=args.vmname, expire_vm_date=args.exp, vc_host=args.vcenter)
-    else:
-       print("!!! --exp is not to be None")
-    quit()
-
-if args.NODES:
-   print("Only Edit Nodes for vm: "+args.vmname+" Ok....")
-   if args.desc is None:
-      print("!!! Please enter Dscriptin")
-      quit()
-   if args.ip is None:
-      print("!!! Please enter IP")
-      quit()
-   else:
-      ip=args.ip
-   try:
-      print (notes_write_vm(args.vcenter, vc_user, vc_pass, ip, args.desc, args.exp))
-      quit()
-   except:
-      print ("!!! ERROR: notes_write_vm: ",sys.exc_info())
-      quit()
-
-if args.MOVE:
-    print ("### Move VM to: ["+args.folder+"]")
-    try:
-       move_vm_to_folder(args.vcenter, args.ip, args.folder, args.cluster)
-    except:
-       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
-    bye()
-    #quit();
-
+# только выделяем ip для машины и выходим
 if args.ONLYIP:
     print("Only reserv IP for vm : "+args.vmname)
     if args.desc is None:
        args.desc = args.vmname
     print ("vname: "+args.vmname + "; desc: "+args.desc)
     ip = ipam_create_ip(hostname=args.vmname, infraname=args.desc, cidr=args.net);
+    bye()
+
+# определяем переменную DataCenter
+if args.datacenter is None:
+    if ds[args.ds]['dc']:
+       args.datacenter = ds[args.ds]['dc']
+       print ( "--datacenter " + ds[args.ds]['dc'] )
+    else:
+       print("Please enter vCenter DataCenter Name [--datacenter ...]")
+       bye()
+
+if args.MOVE:
+    print ("### Move VM to: ["+args.folder+"]")
+    try:
+       move_vm_to_folder(args.vcenter, args.ip, args.folder, args.cluster, args.datacenter )
+    except:
+       print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
+    bye()
 else:
     # check on the fool
     if args.vcenter is None:
@@ -189,14 +201,6 @@ else:
       else:
          print("Please enter vCenter Name [--vcenter ...]")
          quit()
-
-    if args.datacenter is None: 
-       if ds[args.ds]['dc']:
-          args.datacenter = ds[args.ds]['dc']
-          print ( "--datacenter " + ds[args.ds]['dc'] )
-       else:
-          print("Please enter vCenter DataCenter Name [--datacenter ...]")
-          quit()
 
     if args.cluster is None:
        if ds[args.ds]['cl']:
@@ -240,7 +244,7 @@ else:
 
     print ("### Move VM to: ["+args.folder+"]")
     try:
-       move_vm_to_folder(args.vcenter, ip, args.folder, args.cluster)
+       move_vm_to_folder(args.vcenter, ip, args.folder, args.cluster, args.datacenter)
     except:
        print ("!!! ERROR: move_vm_to_folder: ",sys.exc_info())
        #quit()
