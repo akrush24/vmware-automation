@@ -92,6 +92,11 @@ if args.IPRM:
       ipam_rm_ip(args.ip, args.net)
       bye()
 
+def report():
+   print(" - - - - - - - ")
+   print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
+   print(" - - - - - - - ")
+
 # выстаскиваем значения из заявки
 if args.task is not None:
    if re.match("[1-9][0-9].+", args.task):
@@ -103,8 +108,7 @@ if args.task is not None:
       if args.ram is None: args.ram = vmparam['ram']
       if args.template is None: args.template = os_to_template[vmparam['os']]
       args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + "; O:" + vmparam['owner'] + ";"
-      print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
-      # quit() # for debug
+      report()
 
 # отпеделяем vCenter сервер
 if args.vcenter is None:
@@ -267,3 +271,6 @@ else:
        #answ = input('Run disk resize on '+ ip +' [Y/N]?')
        #if answ == 'Y':
        os.system('ssh root@'+ip+'" bash -s" < ./tools/resize-root.sh')
+
+    report()
+    print("IP: " + ip)
