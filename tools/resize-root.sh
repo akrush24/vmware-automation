@@ -5,9 +5,9 @@ echo 1 > /sys/block/sda/device/rescan
 MOUNT_LINE=$(cat /etc/mtab | grep ' / ' | grep -v '^rootfs')
 DEVICE=$(echo "$MOUNT_LINE" | cut -d' ' -f1)
 FSTYPE=$(echo "$MOUNT_LINE" | cut -d' ' -f3)
-GROWPART=$(which growpart)
 
-if [ $? -ne 0 ]; then
+#if [ $? -ne 0 ]; then
+if [ ! $(which growpart) ];then
   echo "growpart command is missing"
   if [ -f /etc/debian_version ]; then
     apt-get install -y cloud-guest-utils
@@ -15,6 +15,8 @@ if [ $? -ne 0 ]; then
     yum install -y cloud-utils-growpart
   fi
 fi
+
+GROWPART=$(which growpart)
 
 if [ $(df | grep ' /$' | wc -l) -eq 0 ]; then
   DEVICE=$(readlink -f "$DEVICE")
