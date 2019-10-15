@@ -93,9 +93,7 @@ if args.IPRM:
       bye()
 
 def report():
-   print(" - - - - - - - ")
    print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
-   print(" - - - - - - - ")
 
 # выстаскиваем значения из заявки
 if args.task is not None:
@@ -273,4 +271,4 @@ else:
        os.system('ssh root@'+ip+'" bash -s" < ./tools/resize-root.sh')
 
     report()
-    print("IP: " + ip)
+    print("IP: " + ip + "\nSSH: user / qwerty$4")
