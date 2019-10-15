@@ -104,7 +104,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     else:
         print ('!!! No network portgroup!')
 
-    print("IP: " + ip)
+    #print("IP: " + ip)
     tf = Terraform(working_dir=ter_dir, variables={ 'vc_host': vc_host,
                                                     'vc_user': vc_user, 'vc_pass': vc_pass,
                                                     'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
