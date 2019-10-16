@@ -271,4 +271,9 @@ else:
        os.system('ssh root@'+ip+'" bash -s" < ./tools/resize-root.sh')
 
     report()
-    print("NAME:" + args.vmname+"\nIP: " + ip + "\nSSH: user / qwerty$4")
+    if re.search(r'centos', args.template.lower()) or re.search(r'ubuntu', args.template.lower()) or re.search(r'lin', args.template.lower()
+):
+       print("NAME: " + args.vmname+"\nIP: " + ip + "\nSSH: user / qwerty$4")
+    else:
+       print("NAME: " + args.vmname+"\nIP: " + ip + "\nRDP: admin / qwerty$4")
+  
