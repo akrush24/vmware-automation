@@ -271,4 +271,4 @@ else:
        os.system('ssh root@'+ip+'" bash -s" < ./tools/resize-root.sh')
 
     report()
-    print("IP: " + ip + "\nSSH: user / qwerty$4")
+    print("NAME:" + args.vmname+"\nIP: " + ip + "\nSSH: user / qwerty$4")
