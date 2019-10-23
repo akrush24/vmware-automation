@@ -118,7 +118,7 @@ if args.vcenter is None:
            bye()
         else:
            args.ds = stor_default
-           print("--datastor is not set, default DataStore is: " + stor_default)
+           print("--datastor is not defined, default DataStore is: " + stor_default)
 
     if ds[args.ds]['vc']:
         args.vcenter = ds[args.ds]['vc']
@@ -219,7 +219,7 @@ else:
 
     if args.net is None:
        args.net = net_default;
-       print( "--net " + args.net )
+       print("--net is not defined, default Net is: " + net_default)
        #print("Please enter NETwork [--net ...]")
 
     if args.desc is None:
