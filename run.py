@@ -7,7 +7,7 @@ from passwd import user_api, pass_api, vc_user, vc_pass
 
 today = datetime.date.today()
 
-version = '0.0.3.0'
+version = '0.0.3.1'
 
 parser = argparse.ArgumentParser()
 
@@ -93,7 +93,7 @@ if args.IPRM:
       bye()
 
 def report():
-   print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc )
+   print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc + "\n--folder " + args.folder )
 
 # выстаскиваем значения из заявки
 if args.task is not None:
@@ -104,8 +104,9 @@ if args.task is not None:
       if args.hdd is None: args.hdd = vmparam['hdd']
       if args.exp is None: args.exp = vmparam['exp'] 
       if args.ram is None: args.ram = vmparam['ram']
+      if args.folder is None: args.folder = vmparam['code'] + '/' + vmparam['block']
       if args.template is None: args.template = os_to_template[vmparam['os']]
-      args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + "; O:" + vmparam['owner'] + ";"
+      args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + "; O:" + vmparam['owner']
       report()
 
 # отпеделяем vCenter сервер
@@ -230,12 +231,11 @@ else:
     if args.hdd is None: args.hdd = 50
     print('### [MEM: '+str(args.ram)+"], [HDD: "+str(args.hdd)+"], [CPU: "+str(args.cpu)+"]")
 
-    try:
-       ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.ram,
-                 vm_disk_size=args.hdd, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
-    except:
-       print("!!! Ошибка при выполнениие функции main()", sys.exc_info())
-       quit()
+    #try:
+    ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.ram, vm_disk_size=args.hdd, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
+    #except:
+    #   print("!!! Ошибка при выделении IP адреса \n", sys.exc_info())
+    #   quit()
 
     print ("### Edit nodes to: ["+str(args.desc)+" "+str(args.exp)+"]")
     try:

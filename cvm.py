@@ -19,27 +19,34 @@ from parameters import template_list, template_linux, template_wind, port_int
 
 # get ip address
 def ipam_create_ip(hostname, infraname, cidr):
-    #try:
-    token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
-    headers = {'token':token}
-    cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
-    get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+    try:
+        token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
+        headers = {'token':token}
+        if cidr is None:
+          print("!!! --net is not defined, quit...")
+          quit()
+        cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
+        get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
 
-    print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
-    if infraname is None:
-       print ("!!! Description is None, exit")
+        print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
+        if infraname is None:
+           print ("!!! Description is None, exit")
+           quit()
+
+        get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
+        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
+        create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
+        print ("### PhpIPAM, create_url: " + create_url)
+        create = requests.post(url = create_url , headers=headers).json()['success']
+        if create == True:
+           print ("### NEW IP for ["+hostname+"] is: ["+ip+"]")
+           return ip  # get ip address
+        else:
+           print("!!! При выделении ip произошла ошибка.")
+           quit()
+    except:
+       print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
        quit()
-
-    get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
-    ip = requests.get(url=get_ip_url, headers=headers).json()['data']
-    create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
-    create = requests.post(url = create_url , headers=headers).json()['success']
-    if create == True:
-       print ("### NEW IP for ["+hostname+"] is: ["+ip+"]")
-       return ip  # get ip address
-    #except:
-    #   print("!!! При выделении IP произошла ошибка! ",sys.exc_info())
-    #   quit()
 
 def ipam_rm_ip(ip, cidr):
     print ("function: ipam_rm_ip("+ ip +")")

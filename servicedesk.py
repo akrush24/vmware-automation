@@ -24,7 +24,10 @@ def get_parameters_vm(taskid):
     d.update({'status': soup.find('select', class_='px200 required').find('option', selected="selected").text})
     d.update({'taskname': soup.find('input', id='name').get('value')})
     d.update({'practica': soup.find('input', id='field1024').get('value')})
+    d.update({'block': soup.find('select', id='field1023').find('option', selected="true").text})
+    d.update({'code': soup.find('input', id='field1020').get('value')})
     d.update({'owner': soup.find('ul', class_='users').find('a', class_='nounderline').text})
     return d
 
-#print ( get_parameters_vm( "23091" ) )
+# for debug
+#print ( get_parameters_vm( "26963" ) )
