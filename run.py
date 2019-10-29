@@ -26,7 +26,7 @@ parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Dat
 parser.add_argument('--cluster',   '-cl', dest='cluster',  help='vSphere Cluster')
 
 parser.add_argument('--hdd',   '--hdd', '-hdd', dest='hdd',   help='Disk Size')
-parser.add_argument('--ram', dest='ram',   help='RAM Size in GB')
+parser.add_argument('--ram', '--mem', dest='ram',   help='RAM Size in GB')
 parser.add_argument('--cpu',     '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc',    '-d', dest='desc',    help='Description')
 parser.add_argument('--template','-t', dest='template',    help='VM Template', choices=template_list)
