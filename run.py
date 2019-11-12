@@ -93,6 +93,10 @@ if args.IPRM:
       bye()
 
 def report():
+   if args.exp is None:
+       args.exp = 'NONE'
+   if args.task is None:
+       args.task = 'NONE'
    print ( "TASK: [" + args.task + "]\n--template " + args.template + "\n--vmname " + args.vmname + "\n--cpu " + args.cpu + "\n--hdd " + args.hdd + "\n--ram " + args.ram + "\n--exp " + args.exp + "\n--desc " + args.desc + "\n--folder " + args.folder )
 
 # выстаскиваем значения из заявки
