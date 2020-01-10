@@ -37,7 +37,7 @@ parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL',choice
 parser.add_argument('--debug', '-D',   dest='debug',  help='debug mode', action='store_true')
 
 parser.add_argument('--exp' ,    '-e',  dest='exp',    help='Expiry date [EXAMPLE: --exp "31/01/20"]')
-parser.add_argument('--ONLYIP',  '--onlyip' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
+parser.add_argument('--ONLYIP',  '--IP' ,'-IP',  dest='ONLYIP', help='Only IP allocation [EXAMPLE: --ONLYIP]', action='store_true')
 parser.add_argument('--iprm', '-IPRM',  dest='IPRM', help='Remove IP allocation', action='store_true')
 parser.add_argument('--expire' , '-E', dest='EXPIRE', help='ONLY Set expire to vm: --name',      action='store_true')
 parser.add_argument('--move' , '-M', dest='MOVE', help='ONLY move vm: --name to folder: --folder',      action='store_true')

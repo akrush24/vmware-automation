@@ -19,7 +19,7 @@ def get_parameters_vm(taskid):
     d.update({'cpu': soup.find('select', id='field1017').find('option', selected="true").text})
     d.update({'ram': soup.find('select', id='field1014').find('option', selected="true").text})
     d.update({'os': soup.find('select', id='field1016').find('option', selected="true").text})
-    d.update({'exp': re.match( "\d\d.\d\d.20", soup.find('input', id='field1022').get('value') ).group(0)})
+    d.update({'exp': re.match( "\d\d.\d\d.20\d\d", soup.find('input', id='field1022').get('value') ).group(0)})
     d.update({'foldervm': soup.find('input', id='field1020').get('value')})
     d.update({'status': soup.find('select', class_='px200 required').find('option', selected="selected").text})
     d.update({'taskname': soup.find('input', id='name').get('value')})
