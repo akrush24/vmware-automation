@@ -43,6 +43,7 @@ parser.add_argument('--expire' , '-E', dest='EXPIRE', help='ONLY Set expire to v
 parser.add_argument('--move' , '-M', dest='MOVE', help='ONLY move vm: --name to folder: --folder',      action='store_true')
 parser.add_argument('-N', dest='NODES', help='Edit Nodes only', action='store_true')
 parser.add_argument('--resize', '-r',      dest='RESIZE', help='Resize disk (only on Linux vms) [EXMPLE --RESIZE]',      action='store_true')
+parser.add_argument('-R',      dest='ONLYRESIZE', help='Only resize disk (only on Linux vms)',      action='store_true')
 parser.add_argument('--task',  dest='task', help='Get parameters from ServiceDesk task (ram,hdd,cpu)')
 
 #parser.add_argument('--', dest='',      help='')
@@ -91,6 +92,13 @@ if args.IPRM:
    else:
       ipam_rm_ip(args.ip, args.net)
       bye()
+
+if args.ONLYRESIZE:
+    if args.ip is None:
+       print("!!! Please enter IP")
+    else:
+       os.system('ssh root@'+args.ip+'" bash -s" < ./tools/resize-root.sh')
+    bye()
 
 def report():
    if args.exp is None:
@@ -268,7 +276,7 @@ else:
        print("!!! You did not enter the VM lifetime. PASS.")
 
 
-    #if args.RESIZE and re.match(r'linux', template(vm_template)): # resize HDD
+    #if args.ReSIZE and re.match(r'linux', template(vm_template)): # resize HDD
     if re.search(r'centos', args.template.lower()) or re.search(r'ubuntu', args.template.lower()) or re.search(r'lin', args.template.lower() ): # resize HDD
        #answ = input('Run disk resize on '+ ip +' [Y/N]?')
        #if answ == 'Y':
