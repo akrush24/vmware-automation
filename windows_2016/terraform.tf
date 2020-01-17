@@ -3,7 +3,7 @@ variable "vc_user" { default = ""}
 variable "vc_pass" { default = ""}
 
 variable "vc_dc" { default = ""}
-variable "vc_cluster" { default = ""}
+variable "vc_destination" { default = ""}
 variable "vc_storage" { default = ""}
 
 variable "vm_portgroup" { default = ""}

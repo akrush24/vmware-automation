@@ -15,8 +15,6 @@ variable "vm_disk_size" { default = "50"}
 variable "vm_ip" { default = ""}
 variable "vm_ip_gw" { default = ""}
 variable "vm_netmask" { default = ""}
-variable "vm_product_key" { default = "D2N9P-3P6X9-2R39C-7RTCD-MDVJX"}
-
 
 provider "vsphere" {
   user           = "${var.vc_user}"
@@ -24,7 +22,6 @@ provider "vsphere" {
   vsphere_server = "${var.vc_host}"
   allow_unverified_ssl = true
 }
-
 
 data "vsphere_datacenter" "dc" {
   name = "${var.vc_dc}"
@@ -35,7 +32,7 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
-data "vsphere_compute_cluster" "cluster" {
+data "vsphere_host" "host" {
   name          = "${var.vc_destination}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
@@ -46,15 +43,15 @@ data "vsphere_network" "network" {
 }
 
 data "vsphere_virtual_machine" "template" {
-  #name          = "ubuntu-16.04"
   name          = "${var.vm_template}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
 resource "vsphere_virtual_machine" "vm" {
   name             = "${var.vm_hostname}"
-  resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
+  resource_pool_id = "${data.vsphere_host.host.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
+
 
   num_cpus = "${var.vm_cpu}"
   memory   = "${var.vm_ram}"
@@ -82,28 +79,19 @@ resource "vsphere_virtual_machine" "vm" {
   clone {
     template_uuid = "${data.vsphere_virtual_machine.template.id}"
 
-     customize {
-      windows_options {
-        computer_name  = "${var.vm_hostname}"
-        workgroup    = "WORKGROUP"
-        admin_password = "q1!@W@"
-        product_key = "${var.vm_product_key}"
-        time_zone = "145"
-        run_once_command_list = [
-          "lmgr.vbs /skms 192.168.245.30",
-          "slmgr.vbs /ato",
-          "powershell -command (Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).SizeMax)"]
-        }
+    customize {
+      linux_options {
+        host_name = "${var.vm_hostname}"
+        domain    = "srv.local"
+      }
 
       network_interface {
         ipv4_address = "${var.vm_ip}"
         ipv4_netmask = "${var.vm_netmask}"
-        dns_server_list = ["172.20.20.20", "192.168.245.20"]
-        dns_domain = "srv.local"
       }
 
       ipv4_gateway = "${var.vm_ip_gw}"
-      dns_server_list = ["8.8.8.8"]
+      dns_server_list = ["192.168.245.20"]
     }
   }
 

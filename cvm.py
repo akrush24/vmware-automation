@@ -68,10 +68,13 @@ def ipam_rm_ip(ip, cidr):
 
 
 #folder project terraform (linux&windows) return ter_dir (./linux, ./windows)
-def template(vm_template):
+def template(vm_template, vm_destination):
 
     if vm_template in template_linux:
-        ter_dir = './linux'
+        if vm_destination == 'host':
+            ter_dir = './linux_host'
+        else:
+            ter_dir = './linux'
         print ("### TER DIR: ["""+ter_dir+"]")
         return ter_dir
     elif vm_template in template_wind:
@@ -79,6 +82,9 @@ def template(vm_template):
             ter_dir = './windows_2016'
         else:
             ter_dir = './windows'
+        if vm_destination == 'host':
+            ter_dir = ter_dir+'_host'
+
         print ("### TER DIR: ["+ter_dir+"]")
         return ter_dir
     else:
@@ -100,7 +106,7 @@ def print_array(arr):
     for a in arr:
        print( str(a) )
 
-def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template,
+def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vm_destination2, vc_storage, vm_template,
                         vm_cpu, vm_ram, vm_disk_size, debug ):
     vm_ip_gw = re.sub('[/]', '', cidr)[:-3] + '1'  # get GW (example 192.168.222.1)
     vm_netmask = cidr[-2:]   # get prefix netmask (example /24)вд
@@ -114,7 +120,7 @@ def create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, 
     #print("IP: " + ip)
     tf = Terraform(working_dir=ter_dir, variables={ 'vc_host': vc_host,
                                                     'vc_user': vc_user, 'vc_pass': vc_pass,
-                                                    'vc_dc': vc_dc, 'vc_cluster': vc_cluster, 'vc_storage': vc_storage,
+                                                    'vc_dc': vc_dc, 'vc_destination': vm_destination2, 'vc_storage': vc_storage,
                                                     'vm_portgroup': vm_portgroup, 'vm_template': vm_template,
                                                     'vm_hostname': hostname, 'vm_cpu': vm_cpu, 'vm_ram': vm_ram,
                                                     'vm_disk_size': vm_disk_size, 'vm_ip': ip, 'vm_ip_gw': vm_ip_gw,
@@ -231,9 +237,9 @@ def move_vm_to_folder(vc_host, ip, folder_vm, cluster, dc):
        
 
 
-def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug, expire_vm_date):
+def main(hostname, infraname, cidr, vc_host, vc_dc, vm_destination2, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, folder_vm, ip, debug, expire_vm_date, vm_destination):
 
-    ter_dir = template(vm_template)
+    ter_dir = template(vm_template, vm_destination)
 
     # remove teraform state file
     if os.path.exists(ter_dir+"/terraform.tfstate"):
@@ -247,7 +253,7 @@ def main(hostname, infraname, cidr, vc_host, vc_dc, vc_cluster, vc_storage, vm_t
     else:
        print ("### YOUR IP is: ["+ip+"]")
 
-    create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vc_cluster, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
+    create_vm_terraform(ter_dir, hostname, ip, cidr, vc_host, vc_user, vc_pass, vc_dc, vm_destination2, vc_storage, vm_template, vm_cpu, vm_ram, vm_disk_size, debug)
 
     return ip
 

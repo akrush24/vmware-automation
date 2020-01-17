@@ -7,7 +7,7 @@ from passwd import user_api, pass_api, vc_user, vc_pass
 
 today = datetime.date.today()
 
-version = '0.0.3.1'
+version = '0.0.4.1'
 
 parser = argparse.ArgumentParser()
 
@@ -24,6 +24,7 @@ parser.add_argument('--datastor', '-ds',   dest='ds',      help="Datastore name"
 parser.add_argument('--folder',           dest='folder',  help='VM Folder in vCenter [EXMPLE: folder1/folder2]')
 parser.add_argument('--datacenter', '-dc', dest='datacenter',  help='vSphere Datacenter name')
 parser.add_argument('--cluster',   '-cl', dest='cluster',  help='vSphere Cluster')
+parser.add_argument('--host', dest='host',  help='vSphere Host (esxi name)')
 
 parser.add_argument('--hdd',   '--hdd', '-hdd', dest='hdd',   help='Disk Size')
 parser.add_argument('--ram', '--mem', dest='ram',   help='RAM Size in GB')
@@ -217,13 +218,23 @@ else:
          print("Please enter vCenter Name [--vcenter ...]")
          quit()
 
-    if args.cluster is None:
-       if ds[args.ds]['cl']:
-          args.cluster = ds[args.ds]['cl']
-          print ( "--cluster " + ds[args.ds]['cl'] )
+    if args.cluster is None and args.host is None:
+       if ds[args.ds]['dest'] == 'cluster':
+          if ds[args.ds]['res']:
+             args.cluster = ds[args.ds]['res']
+             print ( "--cluster " + ds[args.ds]['res'] )
+          else:
+             print("Please enter vCenter Cluster Name [--cluster ...]")
+             quit()
        else:
-          print("Please enter vCenter Cluster Name [--cluster ...]")
-          quit()
+          if ds[args.ds]['res']:
+             args.host = ds[args.ds]['res']
+             print ( "--host " + ds[args.ds]['res'] )
+          else:
+             print("Please enter vCenter Host Name [--host ...]")
+             quit()
+
+
 
     if args.ds is None:
        print("Please enter vCenter DataStore Name [--datastor ...]")
@@ -238,13 +249,24 @@ else:
        print("Please enter Description [--desc ...]")
 
     if args.ram is not None: args.ram = str(int(args.ram)*1024) # convert GB to MB
-    if args.cpu   is None: args.cpu = 2
-    if args.ram   is None: args.ram = 2048
+    if args.cpu is None: args.cpu = 2
+    if args.ram is None: args.ram = 2048
     if args.hdd is None: args.hdd = 50
     print('### [MEM: '+str(args.ram)+"], [HDD: "+str(args.hdd)+"], [CPU: "+str(args.cpu)+"]")
 
     #try:
-    ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.ram, vm_disk_size=args.hdd, vc_dc=args.datacenter, vc_cluster=args.cluster, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp)
+    
+    # where put the VM cluster or host 
+    if args.host is not None:
+       destination = 'host'
+       destination2 = args.host
+    else:
+       destination = 'cluster'
+       destination2 = args.cluster
+
+    print("### Destination: " + destination + " " + destination2)
+
+    ip = main(hostname=args.vmname, infraname=args.desc, cidr=args.net, folder_vm=args.folder,vm_template=args.template, vc_storage=args.ds, vm_cpu=args.cpu, vm_ram=args.ram, vm_disk_size=args.hdd, vc_dc=args.datacenter, vm_destination2=destination2, vc_host=args.vcenter, ip=args.ip, debug=args.debug, expire_vm_date=args.exp, vm_destination=destination)
     #except:
     #   print("!!! Ошибка при выделении IP адреса \n", sys.exc_info())
     #   quit()
