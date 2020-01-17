@@ -26,9 +26,9 @@ os_to_template = {
 template_list = template_linux + template_wind
 
 ds = {
- '15_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter007', 'cl': 'cluster007' },
- '30_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter01', 'cl': 'cluster001' },
- '31_localstore_r10' : { 'vc': 'vcsa02.srv.local', 'dc': 'Datacenter02', 'cl': 'cluster02' }
+ '15_localstore_r10' : { 'vc': 'vcsa01.srv.local', 'dc': 'Datacenter07', 'res': 'host01',    'dest' : 'host' },
+ '30_localstore_r10' : { 'vc': 'vcsa02.srv.local', 'dc': 'Datacenter01', 'res': 'cluster001','dest' : 'cluster' },
+ '31_localstore_r10' : { 'vc': 'vcsa03.srv.local', 'dc': 'Datacenter02', 'res': 'cluster02', 'dest' : 'cluster' }
 }
 
 port_int = {
