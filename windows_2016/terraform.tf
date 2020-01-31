@@ -36,7 +36,7 @@ data "vsphere_datastore" "datastore" {
 }
 
 data "vsphere_compute_cluster" "cluster" {
-  name          = "${var.vc_cluster}"
+  name          = "${var.vc_destination}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 

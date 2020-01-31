@@ -15,7 +15,7 @@ variable "vm_disk_size" { default = "50"}
 variable "vm_ip" { default = ""}
 variable "vm_ip_gw" { default = ""}
 variable "vm_netmask" { default = ""}
-variable "vm_product_key" { default = "D2N9P-3P6X9-2R39C-7RTCD-MDVJX"}
+variable "vm_product_key" { default = "WC2BQ-8NRM3-FDDYY-2BFGV-KHKQY"}
 
 
 provider "vsphere" {
@@ -35,7 +35,7 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
-data "vsphere_compute_cluster" "cluster" {
+data "vsphere_host" "host" {
   name          = "${var.vc_destination}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
@@ -46,13 +46,15 @@ data "vsphere_network" "network" {
 }
 
 data "vsphere_virtual_machine" "template" {
+  #name          = "ubuntu-16.04"
   name          = "${var.vm_template}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
 resource "vsphere_virtual_machine" "vm" {
   name             = "${var.vm_hostname}"
-  resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
+  #resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
+  resource_pool_id = "${data.vsphere_host.host.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
 
   num_cpus = "${var.vm_cpu}"
