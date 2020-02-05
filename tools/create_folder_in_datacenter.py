@@ -102,8 +102,8 @@ def main():
     if (get_obj(content, [vim.Folder], args.folder)):
         print("Folder '%s' already exists" % args.folder)
         return 0
-    create_folder(content, dc.hostFolder, args.folder)
-    print("Successfully created the host folder '%s'" % args.folder)
+    #create_folder(content, dc.hostFolder, args.folder)
+    #print("Successfully created the host folder '%s'" % args.folder)
     create_folder(content, dc.vmFolder, args.folder)
     print("Successfully created the VM folder '%s'" % args.folder)
     return 0
