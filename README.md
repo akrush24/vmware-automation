@@ -71,7 +71,7 @@ EOF!
 ```
 
 ### HELP ###
-For Help USAGE: 
+For Help: 
 ```
 ./run.py --help
 ```
