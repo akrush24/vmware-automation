@@ -10,8 +10,6 @@ from pyVmomi import vmodl
 from pyVmomi import vim
 from tools import tasks
 
-#from parameters import template_list, vc_list, os_to_template, ds, port_int, net_default, stor_default
-
 import datetime
 
 # import paramaners list
