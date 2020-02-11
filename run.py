@@ -7,8 +7,6 @@ from passwd import user_api, pass_api, vc_user, vc_pass
 
 today = datetime.date.today()
 
-version = '0.0.4.1'
-
 parser = argparse.ArgumentParser()
 
 # list of tapameters for choices
