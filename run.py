@@ -115,7 +115,7 @@ if args.task is not None:
       if args.ram is None: args.ram = vmparam['ram']
       if args.folder is None: args.folder = vmparam['block'] + '/' + vmparam['code']
       if args.template is None: args.template = os_to_template[vmparam['os']]
-      args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + ";O:" + vmparam['owner']
+      if args.desc is None: args.desc = "SD:" + args.task + ";" + vmparam['taskname'] + ";O:" + vmparam['owner']
       report()
 
 # отпеделяем vCenter сервер
