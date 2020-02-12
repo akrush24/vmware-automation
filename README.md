@@ -16,7 +16,7 @@ echo 'eval "$(register-python-argcomplete YouScriptDir(ex. ./run.sh) )"' >> ~/.b
 sourse ~/.bashrc
 ```
 
-### PHPIpam ###
+### PHPipam ###
 For this stack need PhpIPAM system: https://github.com/phpipam/phpipam
 
 Add ```$api_allow_unsafe = true;``` in config.php in your phpipam system
