@@ -30,8 +30,6 @@ parser.add_argument('--cpu',     '-c', dest='cpu',     help='CPU Count')
 parser.add_argument('--desc',    '-d', dest='desc',    help='Description')
 parser.add_argument('--template','-t', dest='template',    help='VM Template', choices=template_list)
 
-parser.add_argument('--version', '-V', action='version', version='Version: '+version)
-
 parser.add_argument('--vcenter', '-v', dest='vcenter', help='vCenter URL',choices=vc_list)
 parser.add_argument('--debug', '-D',   dest='debug',  help='debug mode', action='store_true')
 
