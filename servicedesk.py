@@ -22,7 +22,7 @@ def get_parameters_vm(taskid):
     d.update({'exp': re.match( "\d\d.\d\d.20\d\d", soup.find('input', id='field1022').get('value') ).group(0)})
     d.update({'foldervm': soup.find('input', id='field1020').get('value')})
     d.update({'status': soup.find('select', class_='px200 required').find('option', selected="selected").text})
-    d.update({'taskname': soup.find('input', id='name').get('value')})
+    d.update({'taskname': soup.find('input', id='name').get('value').replace("/","-").replace("&","-").replace("?","-")})
     d.update({'practica': soup.find('input', id='field1024').get('value')})
     d.update({'block': soup.find('select', id='field1023').find('option', selected="true").text})
     d.update({'code': soup.find('input', id='field1020').get('value')})
