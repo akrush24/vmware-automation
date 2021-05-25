@@ -1,0 +1,13 @@
+gismu2-bi-bal-01 2 2 40 MSA1040LFF
+gismu2-bi-k8s-01 4 16 40 MSA1040LFF
+gismu2-bi-k8s-02 4 16 40 MSA1040LFF
+gismu2-bi-k8s-03 4 16 40 MSA1040LFF
+gismu2-bi-k8s-04 4 16 40 MSA1040LFF
+gismu2-bi-k8s-05 4 16 40 MSA1040LFF
+gismu2-bi-gpm-01 4 16 40 MSA1040_R6
+gismu2-bi-gps-01 4 16 40 MSA1040_R6
+gismu2-bi-gps-02 4 16 40 MSA1040_R6
+gismu2-bi-gps-03 4 16 40 MSA1040_R6
+gismu2-bi-bkp-01 2 4 40 MSA1040LFF
+gismu2-bi-ch-01 2 16 40 MSA1040LFF
+gismu2-bi-db-replica-01 4 16 40 MSA1040LFF

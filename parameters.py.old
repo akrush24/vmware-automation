@@ -1,0 +1,115 @@
+vc_list = [
+    'vcsa.srv.local',
+    'vc-linx.srv.local',
+    'vc-khut.srv.local'
+]
+
+template_linux = [
+    'template_centos7.3',
+    'template_centos7.2',
+    'template_centos7.5',
+    'template_centos7.5_atk',
+    'template_ubuntu_16.04',
+    'centos7.0-clear-v2-template',
+    'centos7.0-ext4-clear-template',
+    'template_centos6.8',
+    'centos-7-es-5.1.1-template',
+    'template_debian9',
+    'template_centos7.5_x86_64',
+    'centos-7-docker-git-v2-template',
+    'template_rhel7.4',
+    'template_oel_7.4',
+    'sl24-clear-template',
+    'template_ubuntu_16.04',
+    'template_ubuntu_18.04',
+    'template_debian10',
+    'template-debian-10.3',
+    'astra-smolensk1.6'
+]
+
+template_wind = [
+    'template_wind2008',
+    'template_WindowsServer2008R2_SE',
+    'template_WinSrv2012R2RU',
+    'temp_w7_x64',
+    'sl24-clear-template',
+    'shr-clear-template',
+    'template_WinSrv2016EN',
+    'template_WinSrv2012R2EN',
+    'template_SD_WinSrv2012R2EN'
+]
+
+os_to_template = {
+    'Linux - Centos 7' : 'template_centos7.5',
+    'Linux - Centos 6' : 'template_centos6.8',
+    'Linux - Ubuntu 18.04': 'template_ubuntu_18.04',
+    'Linux - Ubuntu 16.04': 'template_ubuntu_16.04',
+    'Windows - Server 2008R2' : 'template_WindowsServer2008R2_SE',
+    'Windows - Server 2012' : 'template_WinSrv2012R2EN',
+    'Windows - Server 2016' : 'template_WinSrv2016EN'
+}
+
+template_list = template_linux+template_wind
+
+ds = {
+ ### LINX
+ '11_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '10_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '12_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '13_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : '172.20.20.13'   , 'dest' : 'host'},
+ '14_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'}, 
+ '15_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '27_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '30_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '31_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '32_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ '91_localstore_r10' : { 'vc' : 'vc-linx.srv.local', 'dc' : 'Datacenter-Linx', 'res' : 'linx-cluster01' , 'dest' : 'cluster'},
+ ### HUTOR
+ 'p2000_R10_L0' : {'vc' : 'vc-khut.srv.local',       'dc' : 'ATK', 'res' : 'Khut-CL1', 'dest' : 'cluster'},
+ 'p2000_R10_L1' : {'vc' : 'vc-khut.srv.local',       'dc' : 'ATK', 'res' : 'Khut-CL1', 'dest' : 'cluster'},
+ 'p2000_R10_L2' : {'vc' : 'vc-khut.srv.local',       'dc' : 'ATK', 'res' : 'Khut-CL1', 'dest' : 'cluster'},
+ 'vm18_localstore' : {'vc' : 'vc-khut.srv.local',    'dc' : 'ATK', 'res' : 'local-cl', 'dest' : 'cluster'},
+ 'vm09_localstore' : {'vc' : 'vc-khut.srv.local',    'dc' : 'ATK', 'res' : 'ars-vm09.srv.local', 'dest' : 'host'},
+ 'vm21_localstore2' : {'vc' : 'vc-khut.srv.local',   'dc' : 'ATK', 'res' : 'local-cl', 'dest' : 'cluster'},
+ 'esx42_localstore' : {'vc' : 'vc-khut.srv.local',   'dc' : 'ATK', 'res' : 'local-cl', 'dest' : 'cluster'},
+ ### SAV
+ 'host01-datastore' : {'vc' : 'vcsa.srv.local', 'dc' : 'PHX', 'res' : 'AKB-Cluster', 'dest' : 'cluster'},
+ 'host05-localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'PHX', 'res' : 'AKB-Cluster', 'dest' : 'cluster'},
+ 'localstore_1cshare_r10' : {'vc' : 'vc1c.srv.local', 'dc' : 'Datacenter-1C', 'res' : 'X', 'dest' : 'cluster'},
+ ### AT
+ 'MSA1040LFF_03' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'sav-r11-cl2', 'dest' : 'cluster'},
+ 'MSA1040LFF_01' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'sav-r11-cl2', 'dest' : 'cluster'},
+ 'MSA1040_R6_7.2k' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'sav-r11-cl2', 'dest' : 'cluster'},
+ 'MSA1040LFF_01' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'sav-r11-cl2', 'dest' : 'cluster'},
+ 'MSA1040_R6_10k' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'sav-r11-cl2', 'dest' : 'cluster'},
+ 'esx-20_localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-20.srv.local', 'dest' : 'host'},
+ 'esx-19_localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-19.srv.local', 'dest' : 'host'},
+ 'esx30_localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-30.srv.local', 'dest' : 'host'},
+ ### AT_r24
+ '16hp_localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-16hp.srv.local', 'dest' : 'host'},
+ '13hp_localstore' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-13hp.srv.local', 'dest' : 'host'},
+ 'esx06_localstore3' : {'vc' : 'vcsa.srv.local', 'dc' : 'ATK', 'res' : 'esx-06.srv.local', 'dest' : 'host'}
+}
+
+port_int = {
+ '192.168.221.0/24': '192.168.221',
+ '192.168.222.0/24': '192.168.222',
+ '192.168.199.0/24': '192.168.199',
+ '192.168.245.0/24': '192.168.245',
+ '192.168.238.0/24': '192.168.238',
+ '192.168.189.0/24': '192.168.189_uni',
+ '192.168.231.0/24': '231_VMNetwork',
+ '192.168.14.0/23' : 'VLAN14',
+ '172.20.20.0/24'  : '172.20.20.0',
+ '172.25.16.0/24'  : '172.25.16.0',
+ '192.168.24.0/24' : 'VLAN_24',     # ATC vcenter.at-consulting.ru
+ '192.168.9.0/24'  : 'VLAN09',      # ATC vcenter.at-consulting.ru
+ '192.168.194.0/24': 'ds-VLAN_194', # ATC vcenter.at-consulting.ru
+ '172.24.1.0/24'   : 'VLAN999',     # ProxMox LXC
+ '192.168.32.0/24' : 'VLAN_32',       # ATC Hutor
+ '172.24.14.0/24'  : '172.24.14.0',
+ '172.24.5.0/24'   : '172.24.5.0'
+}
+
+net_default = "192.168.221.0/24"
+stor_default = "31_localstore_r10"

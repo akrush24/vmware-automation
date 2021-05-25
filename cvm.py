@@ -1,4 +1,5 @@
 import requests
+import urllib3
 import sys
 import re
 import os
@@ -15,16 +16,17 @@ import datetime
 # import paramaners list
 from parameters import template_list, template_linux, template_wind, port_int
 
+urllib3.disable_warnings()
 # get ip address
 def ipam_create_ip(hostname, infraname, cidr):
     try:
-        token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
+        token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api), verify=False).json()['data']['token']
         headers = {'token':token}
         if cidr is None:
           print("!!! --net is not defined, quit...")
           quit()
         cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
-        get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+        get_subnet_id = requests.get(url=cidr_url, headers=headers, verify=False).json()['data'][0]['id']
 
         print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
         if infraname is None:
@@ -32,10 +34,10 @@ def ipam_create_ip(hostname, infraname, cidr):
            quit()
 
         get_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/first_free/"+get_subnet_id
-        ip = requests.get(url=get_ip_url, headers=headers).json()['data']
+        ip = requests.get(url=get_ip_url, headers=headers, verify=False).json()['data']
         create_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/?subnetId="+get_subnet_id+"&ip="+ip+"&hostname="+hostname+"&description="+infraname
         print ("### PhpIPAM, create_url: " + create_url)
-        create = requests.post(url = create_url , headers=headers).json()['success']
+        create = requests.post(url = create_url , headers=headers, verify=False).json()['success']
         if create == True:
            print ("### NEW IP for ["+hostname+"] is: ["+ip+"]")
            return ip  # get ip address
@@ -48,15 +50,15 @@ def ipam_create_ip(hostname, infraname, cidr):
 
 def ipam_rm_ip(ip, cidr):
     print ("function: ipam_rm_ip("+ ip +")")
-    token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api)).json()['data']['token']
+    token = requests.post('https://ipam.phoenixit.ru/api/apiclient/user/', auth=(user_api, pass_api), verify=False).json()['data']['token']
     headers = {'token':token}
     cidr_url = 'https://ipam.phoenixit.ru/api/apiclient/subnets/cidr/' + cidr
-    get_subnet_id = requests.get(url=cidr_url, headers=headers).json()['data'][0]['id']
+    get_subnet_id = requests.get(url=cidr_url, headers=headers, verify=False).json()['data'][0]['id']
 
     print ("### SUBnet ID for ["+cidr+"] is: ["+get_subnet_id+"]")
 
     rm_ip_url = "https://ipam.phoenixit.ru/api/apiclient/addresses/"+ip+"/40/"
-    rm_ip = requests.delete(url=rm_ip_url, headers=headers).json()
+    rm_ip = requests.delete(url=rm_ip_url, headers=headers, verify=False).json()
     print(rm_ip)
     #except:
     #   print("!!! При удалении IP произошла ошибка! ",sys.exc_info())
